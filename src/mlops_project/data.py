@@ -3,51 +3,44 @@ import torch
 from torchvision import datasets, transforms
 import typer
 
+
 def normalize(images: torch.Tensor) -> torch.Tensor:
     """Normalize images."""
     return (images - images.mean()) / images.std()
+
 
 def preprocess_data(chest_xray: str, processed_dir: str) -> None:
     """Process raw data and save it to processed directory."""
     # Create the processed_dir if it does not exist
     os.makedirs(processed_dir, exist_ok=True)
-    # Define the transformations (resize and normalization)
-    transform = transforms.Compose([
-        transforms.Resize((150, 150)),  # Resize to a consistent shape
-        transforms.ToTensor(),  # Convert to tensor
-    ])
-    
-    # Load the datasets using ImageFolder (this will automatically handle the directories)
-    train_dataset = datasets.ImageFolder(os.path.join(chest_xray, 'train'), transform=transform)
-    test_dataset = datasets.ImageFolder(os.path.join(chest_xray, 'test'), transform=transform)
 
-    # Initialize lists to store the images and labels
-    train_images, train_target = [], []
-    for img, label in train_dataset:
-        train_images.append(img)
-        train_target.append(label)
+    # Define the transformations
+    transform = transforms.Compose(
+        [
+            transforms.Resize((150, 150)),
+            transforms.ToTensor(),
+        ]
+    )
 
-    # Convert lists to tensors
-    train_images = torch.stack(train_images)  # Now, all images will be resized and stacked
-    train_target = torch.tensor(train_target)
+    def process_and_save(data_path: str, prefix: str) -> None:
+        """Helper function to process and save the data."""
+        dataset = datasets.ImageFolder(data_path, transform=transform)
+        images, targets = [], []
+        for img, label in dataset:
+            images.append(img)
+            targets.append(label)
 
-    test_images, test_target = [], []
-    for img, label in test_dataset:
-        test_images.append(img)
-        test_target.append(label)
+        images = torch.stack(images)
+        targets = torch.tensor(targets)
 
-    test_images = torch.stack(test_images)  # Now, all images will be resized and stacked
-    test_target = torch.tensor(test_target)
+        images = normalize(images)
 
-    # Normalize the images
-    train_images = normalize(train_images)
-    test_images = normalize(test_images)
+        torch.save(images, os.path.join(processed_dir, f"{prefix}_images.pt"))
+        torch.save(targets, os.path.join(processed_dir, f"{prefix}_target.pt"))
 
-    # Save the processed data
-    torch.save(train_images, os.path.join(processed_dir, 'train_images.pt'))
-    torch.save(train_target, os.path.join(processed_dir, 'train_target.pt'))
-    torch.save(test_images, os.path.join(processed_dir, 'test_images.pt'))
-    torch.save(test_target, os.path.join(processed_dir, 'test_target.pt'))
+    process_and_save(os.path.join(chest_xray, "train"), "train")
+    process_and_save(os.path.join(chest_xray, "test"), "test")
+
 
 def load_chest_xray_data(processed_dir: str) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for chest x-ray."""
@@ -59,8 +52,9 @@ def load_chest_xray_data(processed_dir: str) -> tuple[torch.utils.data.Dataset, 
     # Create datasets
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
-    
+
     return train_set, test_set
+
 
 if __name__ == "__main__":
     typer.run(preprocess_data)
