@@ -51,10 +51,10 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
 
 def load_chest_xray_data(processed_dir: str) -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for chest x-ray."""
-    train_images = torch.load(os.path.join(processed_dir, "train_images.pt"))
-    train_target = torch.load(os.path.join(processed_dir, "train_target.pt"))
-    test_images = torch.load(os.path.join(processed_dir, "test_images.pt"))
-    test_target = torch.load(os.path.join(processed_dir, "test_target.pt"))
+    train_images = torch.load(os.path.join(processed_dir, "train_images.pt"), weights_only=True)
+    train_target = torch.load(os.path.join(processed_dir, "train_target.pt"), weights_only=True)
+    test_images = torch.load(os.path.join(processed_dir, "test_images.pt"), weights_only=True)
+    test_target = torch.load(os.path.join(processed_dir, "test_target.pt"), weights_only=True)
 
     # Create datasets
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
