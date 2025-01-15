@@ -17,7 +17,7 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
     # Define the transformations
     transform = transforms.Compose(
         [
-            transforms.Resize((150, 150)),
+            transforms.Resize((224, 224)),
             transforms.ToTensor(),
         ]
     )
