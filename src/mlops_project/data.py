@@ -76,6 +76,7 @@ def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, 
 
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
+    print(f"Loaded {len(train_set)} training samples and {len(test_set)} test samples.")
 
     return train_set, test_set
 
