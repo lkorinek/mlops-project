@@ -3,6 +3,9 @@ import torch
 from torchvision import datasets, transforms
 import typer
 from typing import Tuple
+from torch.utils.data import Subset
+import numpy as np
+
 
 def normalize(images: torch.Tensor) -> torch.Tensor:
     """
@@ -16,14 +19,19 @@ def normalize(images: torch.Tensor) -> torch.Tensor:
     """
     return (images - images.mean()) / images.std()
 
-def preprocess_data(chest_xray: str, processed_dir: str) -> None:
+
+def preprocess_data(chest_xray: str, processed_dir: str, percentage: float = 1) -> None:
     """
     Process raw chest x-ray data and save the processed data to a directory.
 
     Args:
         chest_xray (str): Path to the raw chest x-ray data.
         processed_dir (str): Path to the directory where processed data will be saved.
+        percentage (float): Percentage of images to be processed.
     """
+    if not (0 < percentage <= 1):
+        raise ValueError("Percentage must be between 0 and 1.")
+
     os.makedirs(processed_dir, exist_ok=True)
 
     # Define the transformations
@@ -43,8 +51,16 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
             prefix (str): Prefix for the saved files.
         """
         dataset = datasets.ImageFolder(data_path, transform=transform)
+
+        # Select a subset of the dataset based on the specified percentage
+        np.random.seed(42)
+        total_samples = len(dataset)
+        num_samples = int(total_samples * percentage)
+        indices = np.random.choice(total_samples, num_samples, replace=False)
+        subset = Subset(dataset, indices)
+
         images, targets = [], []
-        for img, label in dataset:
+        for img, label in subset:
             images.append(img)
             targets.append(label)
 
@@ -60,6 +76,7 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
     process_and_save(os.path.join(chest_xray, "test"), "test")
     process_and_save(os.path.join(chest_xray, "val"), "val")
 
+
 def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """
     Load and return train and test datasets for chest x-ray data.
@@ -70,13 +87,13 @@ def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, 
     Returns:
         Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]: Train and test datasets.
     """
-    train_images = torch.load(os.path.join(processed_dir, "train_images.pt"), weights_only=True) # weights_only to combat userwarning
+    # weights_only to combat user warning
+    train_images = torch.load(os.path.join(processed_dir, "train_images.pt"), weights_only=True)
     train_target = torch.load(os.path.join(processed_dir, "train_target.pt"), weights_only=True)
     test_images = torch.load(os.path.join(processed_dir, "test_images.pt"), weights_only=True)
     test_target = torch.load(os.path.join(processed_dir, "test_target.pt"), weights_only=True)
     val_images = torch.load(os.path.join(processed_dir, "val_images.pt"), weights_only=True)
     val_target = torch.load(os.path.join(processed_dir, "val_target.pt"), weights_only=True)
-
 
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
@@ -85,6 +102,6 @@ def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, 
 
     return train_set, test_set, val_set
 
+
 if __name__ == "__main__":
     typer.run(preprocess_data)
-
