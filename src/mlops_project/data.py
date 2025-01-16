@@ -20,7 +20,7 @@ def normalize(images: torch.Tensor) -> torch.Tensor:
     return (images - images.mean()) / images.std()
 
 
-def preprocess_data(chest_xray: str, processed_dir: str, percentage: float = 1) -> None:
+def preprocess_data(chest_xray: str, processed_dir: str, percentage: float = 1.0) -> None:
     """
     Process raw chest x-ray data and save the processed data to a directory.
 

@@ -69,7 +69,8 @@ def train(config) -> None:
     )
 
     # Using absolute path to ensure working dir is correct
-    trainset, testset, valset = load_chest_xray_data(to_absolute_path("data\processed"))
+    data_dir = os.path.join("data", "processed")
+    trainset, testset, valset = load_chest_xray_data(to_absolute_path(data_dir))
 
     # Dataloader for training and testing set
     train_dataloader = torch.utils.data.DataLoader(
