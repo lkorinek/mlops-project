@@ -17,19 +17,18 @@ class Simple_Network(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1) 
         self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1) 
         self.dropout = nn.Dropout(0.5)                                                              
-        self.flattened_size = 64 * 28 * 28 # or 50176
+        self.flattened_size = 64 * 3 * 150 * 150  #here we have to pass 3 x 150 x 150 (RGB and transformed images)
 
         self.fc1 = nn.Linear(self.flattened_size, 256)  
         self.fc2 = nn.Linear(256, 1) 
 
     def forward(self, x): 
-                                    # Input: (3, 224, 224)
-        x = F.relu(self.conv1(x))   # Output after conv1: (16, 224, 224)
-        x = self.maxpool(x)         # Output after first maxpool: (16, 112, 112)
-        x = F.relu(self.conv2(x))   # Output after conv2: (32, 112, 112)
-        x = self.maxpool(x)         # Output after second maxpool: (32, 56, 56)
-        x = F.relu(self.conv3(x))   # Output after conv3: (64, 56, 56)
-        x = self.maxpool(x)         # Output after third maxpool: (64, 28, 28)
+        x = F.relu(self.conv1(x))   
+        x = self.maxpool(x)         
+        x = F.relu(self.conv2(x))   
+        x = self.maxpool(x)         
+        x = F.relu(self.conv3(x))   
+        x = self.maxpool(x)         
         x = self.dropout(x)
         x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
