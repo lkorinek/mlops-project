@@ -58,7 +58,7 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
 
     process_and_save(os.path.join(chest_xray, "train"), "train")
     process_and_save(os.path.join(chest_xray, "test"), "test")
-    process_and_save(os.path.join(raw_dir, "val"), "val")
+    process_and_save(os.path.join(chest_xray, "val"), "val")
 
 def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """
