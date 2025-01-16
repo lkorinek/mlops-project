@@ -39,6 +39,8 @@ def train(config) -> None:
     hparams = config.experiment  # loading hyperparameters
     set_seed(hparams["seed"])  # setting reproducible seed
     # Wandb setup for project
+    wandb.finish()
+    wandb_logger = WandbLogger()
     wandb.init(
         project="X-Ray - Classification of Pneumonia",
         config={
@@ -67,7 +69,7 @@ def train(config) -> None:
     )
 
     # Using absolute path to ensure working dir is correct
-    trainset, testset = load_chest_xray_data(to_absolute_path("data\processed"))
+    trainset, testset, valset = load_chest_xray_data(to_absolute_path("data\processed"))
 
     # Dataloader for training and testing set
     train_dataloader = torch.utils.data.DataLoader(
@@ -84,18 +86,26 @@ def train(config) -> None:
         num_workers=hparams["num_workers"],
         persistent_workers=hparams["persistent_workers"],
     )
+    val_dataloader = torch.utils.data.DataLoader(
+        valset,
+        batch_size=hparams["batch_size"],
+        shuffle=False,
+        num_workers=hparams["num_workers"],
+        persistent_workers=hparams["persistent_workers"],
+    )
 
     # Saving the trained model in path models in the case of more models of the same model a suffix of "-vx" where x is version number will be added to trained model.
     model_save_path = to_absolute_path("models")
     checkpoint_callback = ModelCheckpoint(
-        dirpath=model_save_path,  # Path to save checkpoints
+        dirpath=model_save_path,
         filename=f"trained_{hparams['model_name']}",
         save_top_k=1,  # Save only the best model
         verbose=True,
+        monitor="val_loss",
+        mode="min",  # Save when validation loss is minimized
+        every_n_epochs=1,
     )
-
     # Trainer with WANDB logging
-    wandb_logger = WandbLogger()
     trainer = pl.Trainer(
         max_epochs=hparams["n_epochs"],
         devices=1 if torch.cuda.is_available() else 0,
@@ -104,7 +114,7 @@ def train(config) -> None:
         callbacks=[checkpoint_callback],
     )
 
-    trainer.fit(model, train_dataloader, trainer)
+    trainer.fit(model, train_dataloader, val_dataloader)
     trainer.test(model, test_dataloader)
 
 

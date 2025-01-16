@@ -18,7 +18,7 @@ class Simple_Network(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
         self.dropout = nn.Dropout(0.5)
-        self.flattened_size = 64 * 3 * 150 * 150  # here we have to pass 3 x 150 x 150 (RGB and transformed images)
+        self.flattened_size = 64 * 28 * 28  # here we have to pass 3 x 150 x 150 (RGB and transformed images)
 
         self.fc1 = nn.Linear(self.flattened_size, 256)
         self.fc2 = nn.Linear(256, 1)
@@ -66,13 +66,26 @@ class Model(pl.LightningModule):
         """
         if model_name == "simple":
             # Using the simple network as a baseline
-            device = torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu"
-            )  # needed to ensure simple network is on cuda.
             model = Simple_Network()
         else:
             # Using timm to leverage pretrained models.
             model = timm.create_model(model_name, pretrained=True, num_classes=num_classes)
+
+            # Freeze all layers
+            for param in model.parameters():
+                param.requires_grad = False
+
+            # Unfreeze the final layer
+            if hasattr(model, "fc"):  # ResNet
+                for param in model.fc.parameters():
+                    param.requires_grad = True
+            elif hasattr(model, "classifier"):  # VGG16
+                for param in model.classifier.parameters():
+                    param.requires_grad = True
+            elif hasattr(model, "head"):  # DenseNet
+                for param in model.head.parameters():
+                    param.requires_grad = True
+
         return model
 
     def forward(self, x):
@@ -95,6 +108,37 @@ class Model(pl.LightningModule):
         self.log("avg_train_loss", avg_loss)  # take the average loss of the batches for each epoch
         self.train_losses.clear()
 
+    def validation_step(self, batch, batch_idx):
+        """
+        Defines a single step of validation and logs metrics.
+        """
+        data, targets = batch
+        outputs = self(data)
+        loss = self.criterion(outputs.squeeze(), targets.float())
+        preds = (torch.sigmoid(outputs) > 0.5).int()
+        targets = targets.int()
+
+        # Compute metrics
+        self.accuracy(preds.squeeze(), targets.float())
+        self.precision(preds.squeeze().float(), targets.float())
+        self.recall(preds.squeeze().float(), targets.float())
+        self.f1(preds.squeeze().float(), targets.float())
+
+        # Log metrics
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_precision", self.precision, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_recall", self.recall, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_f1", self.f1, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+
+        return {
+            "val_loss": loss,
+            "val_acc": self.accuracy,
+            "val_precision": self.precision,
+            "val_recall": self.recall,
+            "val_f1": self.f1,
+        }
+
     def test_step(self, batch, batch_idx):
         """
         Defines a single step of testing and logs metrics.
@@ -103,7 +147,7 @@ class Model(pl.LightningModule):
         outputs = self(data)
         loss = self.criterion(outputs.squeeze(), targets.float())
         preds = (torch.sigmoid(outputs) > 0.5).int()
-        targets = targets.int()  # Ensure targets are integers
+        targets = targets.int()
 
         # Compute metrics
         self.accuracy(preds.squeeze(), targets.float())
