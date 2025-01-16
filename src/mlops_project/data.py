@@ -58,6 +58,7 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
 
     process_and_save(os.path.join(chest_xray, "train"), "train")
     process_and_save(os.path.join(chest_xray, "test"), "test")
+    process_and_save(os.path.join(raw_dir, "val"), "val")
 
 def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """
@@ -69,16 +70,20 @@ def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, 
     Returns:
         Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]: Train and test datasets.
     """
-    train_images = torch.load(os.path.join(processed_dir, "train_images.pt"))
-    train_target = torch.load(os.path.join(processed_dir, "train_target.pt"))
-    test_images = torch.load(os.path.join(processed_dir, "test_images.pt"))
-    test_target = torch.load(os.path.join(processed_dir, "test_target.pt"))
+    train_images = torch.load(os.path.join(processed_dir, "train_images.pt"), weights_only=True) # weights_only to combat userwarning
+    train_target = torch.load(os.path.join(processed_dir, "train_target.pt"), weights_only=True)
+    test_images = torch.load(os.path.join(processed_dir, "test_images.pt"), weights_only=True)
+    test_target = torch.load(os.path.join(processed_dir, "test_target.pt"), weights_only=True)
+    val_images = torch.load(os.path.join(processed_dir, "val_images.pt"), weights_only=True)
+    val_target = torch.load(os.path.join(processed_dir, "val_target.pt"), weights_only=True)
+
 
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
-    print(f"Loaded {len(train_set)} training samples and {len(test_set)} test samples.")
+    val_set = torch.utils.data.TensorDataset(val_images, val_target)
+    print(f"Loaded {len(train_set)} training samples, {len(test_set)} test samples and {len(val_set)} val samples")
 
-    return train_set, test_set
+    return train_set, test_set, val_set
 
 if __name__ == "__main__":
     typer.run(preprocess_data)
