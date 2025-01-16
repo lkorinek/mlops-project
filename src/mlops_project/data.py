@@ -26,10 +26,13 @@ def preprocess_data(chest_xray: str, processed_dir: str) -> None:
     """
     os.makedirs(processed_dir, exist_ok=True)
 
-    transform = transforms.Compose([
-        transforms.Resize((150, 150)),
-        transforms.ToTensor(),
-    ])
+    # Define the transformations
+    transform = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+        ]
+    )
 
     def process_and_save(data_path: str, prefix: str) -> None:
         """
