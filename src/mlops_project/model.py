@@ -40,13 +40,6 @@ class Simple_Network(nn.Module):
 
 class Model(pl.LightningModule):
     def __init__(self, model_name: str, num_classes: int, lr: float = 1e-3, wd: float = 1e-4):
-        """
-        Args:
-            model_name: Name of the model: 'resnet50', 'vgg16', 'densenet121' and 'simple').
-            num_classes: int: 2 (binary). 
-            lr: float: Learning rate.
-            wd: float: Weight decay.
-        """
         super(Model, self).__init__()
         self.lr = lr  # Learning rate
         self.wd = wd  # Weight-decay
@@ -63,12 +56,25 @@ class Model(pl.LightningModule):
 
     def load_model(self, model_name: str, num_classes: int):
         if model_name == "simple":
-            # Using the simple network as a baseline
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # needed to ensure simple network is on cuda.
             model = Simple_Network()
         else:
-            # Using timm to leverage pretrained models. 
             model = timm.create_model(model_name, pretrained=True, num_classes=num_classes)
+
+            # Freeze all layers
+            for param in model.parameters():
+                param.requires_grad = False
+
+            # Unfreeze the final layer
+            if hasattr(model, "fc"):
+                for param in model.fc.parameters():
+                    param.requires_grad = True
+            elif hasattr(model, "classifier"):
+                for param in model.classifier.parameters():
+                    param.requires_grad = True
+            elif hasattr(model, "head"):
+                for param in model.head.parameters():
+                    param.requires_grad = True
+
         return model
 
     def forward(self, x):
@@ -88,6 +94,31 @@ class Model(pl.LightningModule):
         self.log("avg_train_loss", avg_loss)  # take the average loss of the batches for each epoch
         self.train_losses.clear()
 
+    def validation_step(self, batch, batch_idx):
+        data, targets = batch
+        outputs = self(data)
+        loss = self.criterion(outputs.squeeze(), targets.float())
+        preds = (torch.sigmoid(outputs) > 0.5).int()
+        targets = targets.int()
+
+        self.accuracy(preds.squeeze(), targets.float())
+        self.precision(preds.squeeze().float(), targets.float())
+        self.recall(preds.squeeze().float(), targets.float())
+        self.f1(preds.squeeze().float(), targets.float())
+
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_precision", self.precision, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_recall", self.recall, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_f1", self.f1, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+
+        return {
+            "val_loss": loss,
+            "val_acc": self.accuracy,
+            "val_precision": self.precision,
+            "val_recall": self.recall,
+            "val_f1": self.f1,
+        }
 
     def test_step(self, batch, batch_idx):
         data, targets = batch
@@ -127,6 +158,10 @@ def main(model_name: str = "simple", num_classes: int = 1, lr: float = 1e-3, wd:
     dummy_input = torch.randn(1, 3, 224, 224)
     output = model(dummy_input)
     print(f"Output shape: {output.shape}")
+
+
+if __name__ == "__main__":
+    typer.run(main)
 
 
     
