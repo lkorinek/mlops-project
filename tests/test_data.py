@@ -11,7 +11,10 @@ from data import load_chest_xray_data
 x_ray_processed_dir = "data/processed"
 
 
-@pytest.mark.skipif(not os.path.exists(x_ray_processed_dir), reason="Data files not found")
+@pytest.mark.skipif(
+    not (os.path.exists(x_ray_processed_dir) and any(not item.startswith(".") for item in os.listdir(x_ray_processed_dir))),
+    reason="Data files not found or directory is empty"
+)
 def test_data():
     # Pass the processed directory path to load_chest_xray_data
     train, test, val = load_chest_xray_data(x_ray_processed_dir)
