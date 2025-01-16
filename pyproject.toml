@@ -26,6 +26,7 @@ dependencies = {file = ["requirements.txt"]}
 dev = {file = ['requirements_dev.txt']}
 
 [tool.ruff]
+lint.select = ["I"]
 line-length = 120
 
 [tool.coverage.run]
