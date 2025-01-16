@@ -163,8 +163,6 @@ def main(model_name: str = "simple", num_classes: int = 1, lr: float = 1e-3, wd:
 if __name__ == "__main__":
     typer.run(main)
 
-
-    
     # Debugging stuff
     # from data import load_chest_xray_data
     # trainset, testset = load_chest_xray_data(r"data\processed") # Local path to processed data
