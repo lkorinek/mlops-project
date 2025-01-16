@@ -109,7 +109,7 @@ def train(config) -> None:
     # Trainer with WANDB logging
     trainer = pl.Trainer(
         max_epochs=hparams["n_epochs"],
-        devices=1 if torch.cuda.is_available() else 0,
+        devices=1 if torch.cuda.is_available() else "auto",
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         logger=wandb_logger,
         callbacks=[checkpoint_callback],
