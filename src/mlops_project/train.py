@@ -117,6 +117,7 @@ def train(config) -> None:
 
     trainer.fit(model, train_dataloader, val_dataloader)
     trainer.test(model, test_dataloader)
+    wandb.finish()
 
 
 if __name__ == "__main__":

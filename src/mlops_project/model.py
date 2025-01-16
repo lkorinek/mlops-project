@@ -86,12 +86,14 @@ class Model(pl.LightningModule):
         loss = self.criterion(outputs.squeeze(), targets.float())
         self.train_losses.append(loss.item())
         self.accuracy(outputs.squeeze(), targets.float())
-        self.log("train_acc_epoch", self.accuracy, on_step=False, on_epoch=True)
+        if self.trainer and self.trainer.logger:
+            self.log("train_acc_epoch", self.accuracy, on_step=False, on_epoch=True, logger=True)
         return loss
 
     def on_train_epoch_end(self):
         avg_loss = sum(self.train_losses) / len(self.train_losses)
-        self.log("avg_train_loss", avg_loss)  # take the average loss of the batches for each epoch
+        if self.trainer and self.trainer.logger:  # Logging only if trainer is available
+            self.log("avg_train_loss", avg_loss, logger=True)
         self.train_losses.clear()
 
     def validation_step(self, batch, batch_idx):
@@ -106,11 +108,12 @@ class Model(pl.LightningModule):
         self.recall(preds.squeeze().float(), targets.float())
         self.f1(preds.squeeze().float(), targets.float())
 
-        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log("val_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log("val_precision", self.precision, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log("val_recall", self.recall, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log("val_f1", self.f1, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        if self.trainer and self.trainer.logger:
+            self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+            self.log("val_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+            self.log("val_precision", self.precision, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+            self.log("val_recall", self.recall, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+            self.log("val_f1", self.f1, on_step=False, on_epoch=True, prog_bar=True, logger=True)
 
         return {
             "val_loss": loss,
@@ -132,10 +135,11 @@ class Model(pl.LightningModule):
         self.recall(targets, preds.squeeze())
         self.f1(targets, preds.squeeze())
 
-        self.log("test_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-        self.log("test_precision", self.precision, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-        self.log("test_recall", self.recall, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-        self.log("test_f1", self.f1, on_step=False, on_epoch=True, prog_bar=False, logger=True)
+        if self.trainer and self.trainer.logger:
+            self.log("test_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=False, logger=True)
+            self.log("test_precision", self.precision, on_step=False, on_epoch=True, prog_bar=False, logger=True)
+            self.log("test_recall", self.recall, on_step=False, on_epoch=True, prog_bar=False, logger=True)
+            self.log("test_f1", self.f1, on_step=False, on_epoch=True, prog_bar=False, logger=True)
 
         return {
             "test_loss": loss,
