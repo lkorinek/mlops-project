@@ -100,6 +100,7 @@ def test_coverage(ctx: Context) -> None:
     ctx.run("coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
     ctx.run("coverage report -m", echo=True, pty=not WINDOWS)
 
+
 # Documentation commands
 @task(dev_requirements)
 def build_docs(ctx: Context) -> None:
