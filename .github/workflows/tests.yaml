@@ -39,7 +39,7 @@ jobs:
           coverage run -m pytest tests/
           coverage report -m
 
-      - name: Ruff check
+      - name: Ruff formatting check
         run: ruff check .
       - name: Ruff format
         run: ruff format .
