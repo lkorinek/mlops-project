@@ -80,7 +80,7 @@ def test_training_step_with_trainer(model_name, num_classes, mock_input, mock_la
         enable_checkpointing=False,
         logger=False,
         limit_train_batches=1,  # Only one training step
-        limit_val_batches=1  # Only one validation step
+        limit_val_batches=1,  # Only one validation step
     )  # Simplified trainer for testing
 
     # Dummy trainset

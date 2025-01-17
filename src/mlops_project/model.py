@@ -139,7 +139,7 @@ class Model(pl.LightningModule):
         self.f1(targets, preds.squeeze())
 
         if self.trainer and self.trainer.logger:
-            self.log("test_loss", loss,  on_step=False, on_epoch=True, prog_bar=False, logger=True)
+            self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
             self.log("test_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=False, logger=True)
             self.log("test_precision", self.precision, on_step=False, on_epoch=True, prog_bar=False, logger=True)
             self.log("test_recall", self.recall, on_step=False, on_epoch=True, prog_bar=False, logger=True)
