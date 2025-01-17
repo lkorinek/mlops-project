@@ -85,9 +85,12 @@ class Model(pl.LightningModule):
         outputs = self(data)
         loss = self.criterion(outputs.squeeze(), targets.float())
         self.train_losses.append(loss.item())
-        self.accuracy(outputs.squeeze(), targets.float())
+        acc = self.accuracy(outputs.squeeze(), targets.float())
         if self.trainer and self.trainer.logger:
-            self.log("train_acc_epoch", self.accuracy, on_step=False, on_epoch=True, logger=True)
+            self.log("train_loss", loss.item(), on_step=True, on_epoch=True, prog_bar=True, logger=True)
+            self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+
+            # self.log("train_acc_epoch", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def on_train_epoch_end(self):
@@ -109,8 +112,8 @@ class Model(pl.LightningModule):
         self.f1(preds.squeeze().float(), targets.float())
 
         if self.trainer and self.trainer.logger:
-            self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-            self.log("val_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+            self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+            self.log("val_acc", self.accuracy, on_step=True, on_epoch=True, prog_bar=True, logger=True)
             self.log("val_precision", self.precision, on_step=False, on_epoch=True, prog_bar=True, logger=True)
             self.log("val_recall", self.recall, on_step=False, on_epoch=True, prog_bar=True, logger=True)
             self.log("val_f1", self.f1, on_step=False, on_epoch=True, prog_bar=True, logger=True)
@@ -136,6 +139,7 @@ class Model(pl.LightningModule):
         self.f1(targets, preds.squeeze())
 
         if self.trainer and self.trainer.logger:
+            self.log("test_loss", loss,  on_step=False, on_epoch=True, prog_bar=False, logger=True)
             self.log("test_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=False, logger=True)
             self.log("test_precision", self.precision, on_step=False, on_epoch=True, prog_bar=False, logger=True)
             self.log("test_recall", self.recall, on_step=False, on_epoch=True, prog_bar=False, logger=True)

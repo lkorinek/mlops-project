@@ -1,4 +1,5 @@
 import os
+import re
 
 from invoke import Context, task
 from dotenv import load_dotenv
@@ -86,6 +87,33 @@ def docker_train(ctx: Context) -> None:
         echo=True,
         pty=not WINDOWS,
     )
+
+
+@task
+def wandb_sweep(ctx, config_path="configs/sweep.yaml") -> None:
+    """Run a W&B sweep and start the agent."""
+    try:
+        # Create the sweep
+        print(f"Creating W&B sweep with config: {config_path}")
+        sweep_result = ctx.run(f"wandb sweep {config_path}", echo=True, pty=True, warn=True)
+
+        # Extract sweep command
+        ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+        sweep_output = ansi_escape.sub("", sweep_result.stdout.strip())
+
+        pattern = r"(wandb agent [\w/]+)"
+        match = re.search(pattern, sweep_output)
+        if not match:
+            print("Error: Could not extract sweep command from W&B output.")
+            return
+        sweep_command = match.group(0)
+
+        # Start the W&B agent
+        ctx.run(sweep_command, echo=True, pty=True)
+        print(f"Sweep created using command: {sweep_command}")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 @task
