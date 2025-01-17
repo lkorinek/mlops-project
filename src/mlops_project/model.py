@@ -1,13 +1,13 @@
+import pytorch_lightning as pl
+import timm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
-import timm
 import torchmetrics
 import typer
 
 # Profiling
-from torch.profiler import profile, ProfilerActivity, tensorboard_trace_handler
+from torch.profiler import ProfilerActivity, profile, tensorboard_trace_handler
 
 
 class Simple_Network(nn.Module):

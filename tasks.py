@@ -1,8 +1,8 @@
 import os
 import re
 
-from invoke import Context, task
 from dotenv import load_dotenv
+from invoke import Context, task
 
 WINDOWS = os.name == "nt"
 PROJECT_NAME = "mlops_project"
@@ -119,6 +119,7 @@ def wandb_sweep(ctx, config_path="configs/sweep.yaml") -> None:
 @task
 def ruff_format(ctx: Context) -> None:
     """Train model."""
+    ctx.run(f"ruff check . --fix", echo=True, pty=not WINDOWS)
     ctx.run(f"ruff format .", echo=True, pty=not WINDOWS)
 
 

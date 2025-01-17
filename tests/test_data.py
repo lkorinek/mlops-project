@@ -1,7 +1,8 @@
 import os
-import torch
-import pytest
 import sys
+
+import pytest
+import torch
 
 sys.path.append(os.path.realpath("./src/mlops_project"))
 

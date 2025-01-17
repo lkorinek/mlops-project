@@ -1,13 +1,13 @@
-import torch
+import os
+import sys
+
 import pytest
 import timm
+import torch
 from pytorch_lightning import Trainer
 
-import sys
-import os
-
 sys.path.append(os.path.realpath("./src/mlops_project"))
-from model import Simple_Network, Model
+from model import Model, Simple_Network
 
 # Check if running in CI (GitHub Actions sets the `CI` environment variable to "true")
 IN_GITHUB_ACTIONS = os.getenv("CI", "false").lower() == "true"

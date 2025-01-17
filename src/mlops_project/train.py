@@ -1,19 +1,20 @@
 # Pytorch and Pytorch-lighning packages
-import torch
-import pytorch_lightning as pl
-from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.callbacks import ModelCheckpoint
+import logging
 import os
 
 # Logging
 import hydra
+import pytorch_lightning as pl
+import torch
 from hydra.utils import to_absolute_path
-import wandb
-import logging
-from omegaconf import OmegaConf
 
 # import from project
 from model import Model
+from omegaconf import OmegaConf
+from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.loggers import WandbLogger
+
+import wandb
 from data import load_chest_xray_data
 
 

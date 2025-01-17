@@ -1,10 +1,11 @@
 import os
-import torch
-from torchvision import datasets, transforms
-import typer
 from typing import Tuple
-from torch.utils.data import Subset
+
 import numpy as np
+import torch
+import typer
+from torch.utils.data import Subset
+from torchvision import datasets, transforms
 
 
 def normalize(images: torch.Tensor) -> torch.Tensor:
