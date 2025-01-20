@@ -4,11 +4,9 @@ import sys
 import pytest
 import torch
 
-sys.path.append(os.path.realpath("/Users/katpa/chest_xray/processed"))
-
 from src.mlops_project.data import load_chest_xray_data
 
-# Path to the proces sed data directory
+# Path to the processed data directory
 x_ray_processed_dir = "data/processed"
 
 
