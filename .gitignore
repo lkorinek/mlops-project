@@ -181,6 +181,6 @@ googleapiclient
 outputs/
 models/
 wandb/
-/data
-
+data/raw/*
+data/processed/*
 default.json
