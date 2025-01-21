@@ -1,12 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 import torch
+from model import Model
 from torchvision import transforms
 from PIL import Image
-
+import os
+from pathlib import Path
 
 # Initialize FastAPI app
-app = FastAPI()
+#app = FastAPI()
 
 # Global variable to hold the model
 model = None
@@ -23,12 +25,14 @@ async def lifespan(app: FastAPI):
     """
     global model
     print("Loading model")
-
-    # Load the trained model (update the path accordingly)
-    trained_model_path = "path_for_the_model"  # TODO: Double-check and update this path
+    trained_model_path = "model_path" # my example path r"./models/trained_densenet121.ckpt"
+    model_filename = Path(trained_model_path).name
+    model_name = model_filename.replace("trained_", "").split('.')[0]
     if os.path.exists(trained_model_path) and trained_model_path.endswith('.ckpt'):
-        print(f"Loading model from {trained_model_path}")
-        model = Model.load_from_checkpoint(trained_model_path)
+        # Create specific model with random weights
+        model = Model(model_name=model_name, num_classes=1)
+        checkpoint = torch.load(trained_model_path) # load checkpoint
+        model.load_state_dict(checkpoint['state_dict']) # load the checkpoint weights
         model.eval()  # Set the model to evaluation mode
     else:
         raise HTTPException(status_code=400, detail="Model not found")
@@ -39,8 +43,8 @@ async def lifespan(app: FastAPI):
     print("Cleaning up")
     del model
 
-# Attach the lifespan function to the FastAPI app
-app.lifespan(lifespan)
+#app.lifespan(lifespan)
+app = FastAPI(lifespan=lifespan)
 
 # Define the image transformation pipeline
 transform = transforms.Compose([
@@ -84,7 +88,3 @@ async def predict_pneumonia(file: UploadFile = File(...)):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
-
-
-                            
