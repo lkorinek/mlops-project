@@ -1,11 +1,13 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 import torch
-from model import Model
+from src.mlops_project.model import Model, Simple_Network
 from torchvision import transforms
 from PIL import Image
 import os
 from pathlib import Path
+
+project_root = Path(__file__).resolve().parents[2] 
 
 # Initialize FastAPI app
 #app = FastAPI()
@@ -24,18 +26,24 @@ async def lifespan(app: FastAPI):
         None: Used for the app's lifespan management.
     """
     global model
+    model_name = "trained_densenet121" # model_name in models folder
+    model_path = model_name + ".ckpt"
+
     print("Loading model")
-    trained_model_path = "model_path" # my example path r"./models/trained_densenet121.ckpt"
+    trained_model_path = project_root / "models" / model_path 
+
     model_filename = Path(trained_model_path).name
     model_name = model_filename.replace("trained_", "").split('.')[0]
-    if os.path.exists(trained_model_path) and trained_model_path.endswith('.ckpt'):
+    if trained_model_path.exists() and trained_model_path.suffix == ".ckpt":
         # Create specific model with random weights
         model = Model(model_name=model_name, num_classes=1)
-        checkpoint = torch.load(trained_model_path) # load checkpoint
+        checkpoint = torch.load(trained_model_path, weights_only=True, map_location=torch.device("cpu")) # load checkpoint
+        print(f"Loading checkpoint from {trained_model_path}...")
         model.load_state_dict(checkpoint['state_dict']) # load the checkpoint weights
         model.eval()  # Set the model to evaluation mode
+        print("Model loaded successfully!")
     else:
-        raise HTTPException(status_code=400, detail="Model not found")
+        raise HTTPException(status_code=400, detail="Model not found")   
     
     yield  # Yield control back to FastAPI
 
