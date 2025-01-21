@@ -1,7 +1,6 @@
 outs:
 - hash: md5
   path: data
-  files:
-  - relpath: .DS_Store
-    md5: 46b916e3e04dbc1b34b9be6ca9268485
-    size: 6148
+  md5: e2d208b6bd72068a02a7bc0bc37b8b3c.dir
+  nfiles: 5856
+  size: 1236482806
