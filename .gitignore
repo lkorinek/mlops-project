@@ -176,8 +176,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-data/
+googleapiclient
+
 outputs/
 models/
 wandb/
-/data
+data/raw/*
+data/processed/*
+default.json
