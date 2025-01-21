@@ -3,5 +3,5 @@
 ['remote "myremote"']
     url = gs://x-ray-data-molps/chest_xray/
 ['remote "remote_storage"']
-    url = ../x-ray-data-molps/chest_xray
+    url = gs://mlops-project-data-bucket
     version_aware = true
