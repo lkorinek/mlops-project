@@ -6,7 +6,6 @@ RUN apt update && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
 COPY src src/
-COPY data data/
 COPY configs configs/
 RUN mkdir -p models
 RUN mkdir -p reports/figures
@@ -16,5 +15,14 @@ COPY pyproject.toml pyproject.toml
 WORKDIR /
 RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 RUN pip install . --no-deps --no-cache-dir --verbose
+
+# data
+RUN dvc init --no-scm
+COPY .dvc/config .dvc/config
+COPY data.dvc data.dvc
+RUN dvc config core.no_scm true
+COPY default.json default.json
+RUN dvc remote modify --local remote_storage credentialpath default.json
+RUN dvc pull --no-run-cache
 
 ENTRYPOINT ["python", "-u", "src/mlops_project/train.py"]

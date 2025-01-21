@@ -15,7 +15,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 
 import wandb
-from data import load_chest_xray_data
+from data import load_chest_xray_data, preprocess_data
 
 
 def set_seed(seed: int):
@@ -36,6 +36,13 @@ log = logging.getLogger(__name__)
 
 @hydra.main(config_path=to_absolute_path("configs/train_config"), config_name="default_config.yaml", version_base="1.1")
 def train(config) -> None:
+    raw_dir = to_absolute_path(os.path.join("data", "raw"))
+    data_dir = to_absolute_path(os.path.join("data", "processed"))
+
+    os.makedirs(data_dir, exist_ok=True)
+    if not os.listdir(data_dir):
+        preprocess_data(raw_dir, data_dir)
+
     print(f"configuration: \n {OmegaConf.to_yaml(config)}")
     hparams = config.experiment  # loading hyperparameters
     set_seed(hparams["seed"])  # setting reproducible seed
@@ -76,8 +83,7 @@ def train(config) -> None:
     )
 
     # Using absolute path to ensure working dir is correct
-    data_dir = os.path.join("data", "processed")
-    trainset, testset, valset = load_chest_xray_data(to_absolute_path(data_dir))
+    trainset, testset, valset = load_chest_xray_data(data_dir)
 
     # Dataloader for training and testing set
     train_dataloader = torch.utils.data.DataLoader(

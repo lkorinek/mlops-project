@@ -21,12 +21,12 @@ def normalize(images: torch.Tensor) -> torch.Tensor:
     return (images - images.mean()) / images.std()
 
 
-def preprocess_data(chest_xray: str, processed_dir: str, percentage: float = 1.0) -> None:
+def preprocess_data(raw_dir: str, processed_dir: str, percentage: float = 1.0) -> None:
     """
     Process raw chest x-ray data and save the processed data to a directory.
 
     Args:
-        chest_xray (str): Path to the raw chest x-ray data.
+        raw_dir (str): Path to the raw chest x-ray data.
         processed_dir (str): Path to the directory where processed data will be saved.
         percentage (float): Percentage of images to be processed.
     """
@@ -73,9 +73,9 @@ def preprocess_data(chest_xray: str, processed_dir: str, percentage: float = 1.0
         torch.save(images_tensor, os.path.join(processed_dir, f"{prefix}_images.pt"))
         torch.save(targets_tensor, os.path.join(processed_dir, f"{prefix}_target.pt"))
 
-    process_and_save(os.path.join(chest_xray, "train"), "train")
-    process_and_save(os.path.join(chest_xray, "test"), "test")
-    process_and_save(os.path.join(chest_xray, "val"), "val")
+    process_and_save(os.path.join(raw_dir, "train"), "train")
+    process_and_save(os.path.join(raw_dir, "test"), "test")
+    process_and_save(os.path.join(raw_dir, "val"), "val")
 
 
 def load_chest_xray_data(processed_dir: str) -> Tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
