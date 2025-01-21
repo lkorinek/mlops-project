@@ -8,6 +8,7 @@ DTU Machine Learning Operations
 - **Frederik Sartov Olsen** (s204118)
 - **Konstantinos-Athanasios Papagoras PhD** (s230068)
 - **Yessin Moakher** (s250283)
+- **Stiina Salumets** (s250088)
 
 ---
 
