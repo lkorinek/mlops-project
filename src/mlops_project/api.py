@@ -26,9 +26,13 @@ async def lifespan(app: FastAPI):
 
     # Load the trained model (update the path accordingly)
     trained_model_path = "path_for_the_model"  # TODO: Double-check and update this path
-    model = Model.load_from_checkpoint(trained_model_path)
-    model.eval()  # Set the model to evaluation mode
-
+    if os.path.exists(trained_model_path) and trained_model_path.endswith('.ckpt'):
+        print(f"Loading model from {trained_model_path}")
+        model = Model.load_from_checkpoint(trained_model_path)
+        model.eval()  # Set the model to evaluation mode
+    else:
+        raise HTTPException(status_code=400, detail="Model not found")
+    
     yield  # Yield control back to FastAPI
 
     # Cleanup resources after shutdown
