@@ -1,8 +1,9 @@
 # Base image
+#FROM  nvcr.io/nvidia/pytorch:22.07-py3 AS base
 FROM python:3.11-slim AS base
 
-ARG DEFAULT_JSON_PATH
-RUN printf "%s" "${DEFAULT_JSON_PATH}" > default.json
+ARG DEFAULT_JSON
+RUN printf "%s" "${DEFAULT_JSON}" > default.json
 
 RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \

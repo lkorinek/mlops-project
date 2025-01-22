@@ -5,7 +5,7 @@ steps:
     - DOCKER_BUILDKIT=1
   args: [
     '-c',
-    "eval $(echo docker build . --build-arg 'DEFAULT_JSON_PATH=\"$$DEFAULT_JSON\"' -t europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repository/train:latest -f dockerfiles/train.dockerfile)"
+    "eval $(echo docker build . --build-arg 'DEFAULT_JSON=\"$$DEFAULT_JSON\"' -t europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repository/train:latest -f dockerfiles/train.dockerfile)"
   ]
   secretEnv: ['DEFAULT_JSON']
 
