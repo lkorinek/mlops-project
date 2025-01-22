@@ -67,7 +67,7 @@ async def predict_pneumonia(file: UploadFile = File(...)):
     # Perform prediction
     with torch.no_grad():
         output = model(image_tensor)
-        _, predicted = torch.max(output, 1)
+        predicted = (torch.sigmoid(output) > 0.5).int()
         label = true_labels[predicted.item()]
     return JSONResponse(content={"label": label})
 
