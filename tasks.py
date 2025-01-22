@@ -63,8 +63,10 @@ def test(ctx: Context) -> None:
 @task
 def docker_build(ctx: Context, progress: str = "plain") -> None:
     """Build docker image."""
+    with open("default.json", "r") as file:
+        default_json = file.read()
     ctx.run(
-        f"docker build -t train:latest . -f dockerfiles/train.dockerfile --progress={progress}",
+        f"docker build -t train:latest . -f dockerfiles/train.dockerfile --progress={progress} --build-arg DEFAULT_JSON_PATH='{default_json}'",
         echo=True,
         pty=not WINDOWS,
     )

@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Unit Tests & Build
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip setuptools wheel
-          pip install -r requirements.txt
+          pip install -r requirements.txt -r requirements_dev.txt
           pip list
 
 
@@ -40,3 +40,21 @@ jobs:
 
       - name: Ruff format
         run: ruff format .
+  build:
+    needs: test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Auth with GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCLOUD_SERVICE_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Submit build
+      run: gcloud builds submit . --config cloudbuild.yaml

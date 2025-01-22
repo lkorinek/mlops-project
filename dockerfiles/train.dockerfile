@@ -1,6 +1,9 @@
 # Base image
 FROM python:3.11-slim AS base
 
+ARG DEFAULT_JSON_PATH
+RUN printf "%s" "${DEFAULT_JSON_PATH}" > default.json
+
 RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
@@ -21,7 +24,7 @@ RUN dvc init --no-scm
 COPY .dvc/config .dvc/config
 COPY data.dvc data.dvc
 RUN dvc config core.no_scm true
-COPY default.json default.json
+
 RUN dvc remote modify --local remote_storage credentialpath default.json
 RUN dvc pull --no-run-cache
 
