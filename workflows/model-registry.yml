@@ -1,0 +1,48 @@
+name: Test Model Updates
+
+on:
+  push:
+    paths:
+      - 'src/mlops_project/model.py'  # Trigger only for changes to model.py
+  pull_request:
+    paths:
+      - 'src/mlops_project/model.py'  # Trigger on PRs for changes to model.py
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}  # Matrix strategy for different OSes
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]  # Test on Ubuntu, macOS, and Windows
+
+    steps:
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Set up Python environment
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Run specific test script
+      - name: Run Tests
+        run: |
+          pytest tests/test_model.py --maxfail=1 --disable-warnings -q  # Run only the specific test script
+
+      # (Optional) Upload test results
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test_results/
+
+
