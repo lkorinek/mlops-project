@@ -44,7 +44,7 @@ def train(config) -> None:
         preprocess_data(raw_dir, data_dir)
 
     print(f"configuration: \n {OmegaConf.to_yaml(config)}")
-    hparams = config.experiment  # loading hyperparameters
+    hparams = config["experiment"]  # loading hyperparameters
     set_seed(hparams["seed"])  # setting reproducible seed
     # Wandb setup for project
     wandb.finish()
