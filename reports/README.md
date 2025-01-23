@@ -353,7 +353,11 @@ For the training part of the project, we used Hydra along with a configuration f
 >
 > Answer:
 
---- question 13 fill here ---
+To ensure reproducibility of our experiments we made use of hydra config files that outputs a report of the hyperparameters each time a model is trained along with a function named set_seed. 
+This function ensures the model configuration using the torch library for all devices cpu, gpu and even multi-gpu are initialized the same way each time and are deterministic. 
+To reproduce an experiment we would simply go to the output folder with our experiment and copy paste these configs and input them into our training configuration and run the train.py file. 
+This ensures the model's reproducibility, provided it is run either within a docker container or on the same operating system as the model you're trying to reproduce was trained on. 
+Running the model on different operating systems with the same config will likely give different results.
 
 ### Question 14
 
