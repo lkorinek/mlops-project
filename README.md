@@ -174,6 +174,7 @@ This `tasks.py` file contains automation tasks. It uses the `invoke` library.
 The directory structure of the project looks like this:
 
 ```txt
+├── .dvc/                     # Data version control
 ├── .github/                  # GitHub actions and dependabot
 │   ├── dependabot.yaml
 │   └── workflows/
@@ -183,30 +184,15 @@ The directory structure of the project looks like this:
 │   ├── processed
 │   └── raw
 ├── dockerfiles/              # Dockerfiles
-│   ├── api.Dockerfile
-│   └── train.Dockerfile
 ├── docs/                     # Documentation
-│   ├── mkdocs.yml
-│   └── source/
-│       └── index.md
 ├── models/                   # Trained models
 ├── notebooks/                # Jupyter notebooks
 ├── reports/                  # Reports
 │   └── figures/
 ├── src/                      # Source code
-│   ├── project_name/
-│   │   ├── __init__.py
-│   │   ├── api.py
-│   │   ├── data.py
-│   │   ├── evaluate.py
-│   │   ├── models.py
-│   │   ├── train.py
-│   │   └── visualize.py
-└── tests/                    # Tests
-│   ├── __init__.py
-│   ├── test_api.py
-│   ├── test_data.py
-│   └── test_model.py
+│   └── mlops_project/
+├── tests/                    # Tests
+├── .dvcignore
 ├── .gitignore
 ├── .pre-commit-config.yaml
 ├── LICENSE
