@@ -7,6 +7,7 @@ from PIL import Image
 import os
 from pathlib import Path
 from google.cloud import storage
+from pydantic import BaseModel
 
 import anyio
 import numpy as np
@@ -18,12 +19,14 @@ from transformers import CLIPModel, CLIPProcessor
 # Project root to get the models path
 project_root = Path(__file__).resolve().parents[2]
 
-MODEL_FILE_NAME = "trained_resnet50.ckpt"
-BUCKET_NAME = os.getenv("GCP_BUCKET_NAME", "your-gcp-bucket-name")  # Update with your bucket name
+BUCKET_NAME = os.getenv("GCP_BUCKET_NAME", "trained_models_mlops")  # Update with your bucket name
+LOCAL_MODEL_DIR = project_root / "cloud_storage_models"
 
-# Initialize global variables for CLIP model and processor
+# Initialize global variables for model, CLIP model, and processor
+model = None
 clip_model = None
 processor = None
+current_model_name = None
 
 # Image transformation pipeline
 transform = transforms.Compose([
@@ -31,9 +34,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-# Data drift stuff
-
-# Function to initialize CLIP model and processor
+# Initialize CLIP model and processor
 def initialize_clip():
     global clip_model, processor
     if clip_model is None or processor is None:
@@ -42,40 +43,79 @@ def initialize_clip():
         processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
         print("CLIP model and processor loaded.")
 
-# Function to download model from GCP
-def download_model_from_gcp(destination_path):
-    """Download the model file from a GCP bucket."""
+# List available models in the GCP bucket
+def list_models_in_gcp():
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
-    blob = bucket.blob(MODEL_FILE_NAME)
-    blob.download_to_filename(destination_path)
-    print(f"Model {MODEL_FILE_NAME} downloaded from GCP bucket {BUCKET_NAME}.")
+    return [blob.name for blob in bucket.list_blobs() if blob.name.endswith(".ckpt")]
+
+# Download a model from GCP
+def download_model_from_gcp(model_name):
+    client = storage.Client()
+    bucket = client.bucket(BUCKET_NAME)
+    
+    # Remove 'trained_models/' prefix if it's included in the model name
+    if model_name.startswith("trained_models/"):
+        model_name = model_name[len("trained_models/"):]
+
+    # Construct the blob path and download the model
+    blob = bucket.blob(f"trained_models/{model_name}")  # Ensure correct path in GCP bucket
+    
+    # Extract the model filename
+    model_filename = model_name.split("/")[-1]
+    local_path = LOCAL_MODEL_DIR / model_filename
+
+    if not local_path.exists():
+        print(f"Downloading model {model_name} from GCP bucket {BUCKET_NAME}...")
+        try:
+            blob.download_to_filename(local_path)
+            print(f"Model downloaded to {local_path}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to download model {model_name}: {str(e)}")
+    else:
+        print(f"Model {local_path} already exists locally. Skipping download.")
+    
+    return local_path
+
+
+def load_model(model_path):
+    """
+    Load the model and assign as current model 
+    """
+    global model, current_model_name  
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model file {model_path} not found.")
+    
+    model_name = model_path.stem.replace("trained_", "").split('-')[0]
+    model = Model.load_from_checkpoint(model_path, model_name=model_name, num_classes=1, map_location=torch.device("cpu"))
+    model.eval()
+    current_model_name = model_name  # Update the global variable
+    print(f"Loaded model: {current_model_name}")
 
 async def lifespan(app: FastAPI):
     """
-    Manages the lifespan of the FastAPI app by loading and cleaning up the model.
+    Manages the lifespan of the FastAPI app
     """
-    global model
-    print("Loading model...")
-    trained_model_path = project_root / "models" / MODEL_FILE_NAME
+    global model, current_model_name
+    print("Initializing default model...")
+    LOCAL_MODEL_DIR.mkdir(exist_ok=True)
 
-    # If the model is not found locally, download it from GCP
-    if not trained_model_path.exists():
-        print(f"Model file {MODEL_FILE_NAME} not found locally. Downloading from GCP...")
-        download_model_from_gcp(trained_model_path)
+    # Default model that gets loaded (from cloud)
+    default_model_name = "trained_densenet121-v1.ckpt" 
+    try:
+        # Check if the model exists in GCP before attempting to download
+        available_models = list_models_in_gcp()
+        if f"trained_models/{default_model_name}" not in available_models: 
+            raise RuntimeError(f"Model: {default_model_name} not found in the GCP bucket.")
+        
+        model_path = download_model_from_gcp(default_model_name)
+        print(model_path)
+        load_model(model_path)
+        print(f"Default model - '{current_model_name}' loaded successfully.")
+    except Exception as e:
+        raise RuntimeError(f"Failed to initialize the default model: {str(e)}")
 
-    # Ensure the model file exists
-    if trained_model_path.suffix == ".ckpt":
-        # Trim the model name
-        model_name = trained_model_path.stem.replace("trained_", "").split('-')[0]
-        # Init model and load trained weights
-        model = Model.load_from_checkpoint(trained_model_path, model_name=model_name, num_classes=1, map_location=torch.device("cpu"))
-        model.eval()  
-        print("Model loaded successfully!")
-    else:
-        raise RuntimeError("Model file not found or invalid")
-
-    yield  # App continues running
+    yield
 
     # Cleanup
     print("Cleaning up...")
@@ -83,13 +123,74 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+@app.get("/models")
+async def list_models():
+    """
+    List available models in the GCP bucket.
+    """
+    available_models = list_models_in_gcp()
+    return {"available_models": available_models}
+
+# Helper for requesting the model
+class ModelSelectRequest(BaseModel):
+    model_name: str
+
+@app.post("/models/select", response_model=dict)
+async def select_model(request: ModelSelectRequest):
+    """
+    Select a specific model for inference from the GCP bucket.
+    """
+    global model, current_model_name # updating
+
+    # Print the request data for debugging
+    print(f"Received request: {request.dict()}")
+    model_name = request.model_name  
+    available_models = list_models_in_gcp()
+    print(f"Available models: {available_models}")
+
+    # Check if the requested model exists in GCP bucket
+    if model_name not in available_models:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "detail": f"Model '{model_name}' not found in the bucket.",
+                "available_models": available_models,
+            },
+        )
+    
+    try:
+        # Download and load the model
+        model_path = download_model_from_gcp(model_name)
+        load_model(model_path)
+        current_model_name = model_name  # Update the current model name
+        return {"message": f"Model '{model_name}' loaded successfully."}
+
+    except Exception as e:
+        # Return a more specific error if something goes wrong during model loading
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Failed to load model '{model_name}': {str(e)}"},
+        )
+
+@app.get("/models/current")
+async def get_current_model():
+    """
+    Get the name of the currently loaded model.
+    """
+    if current_model_name is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No model is currently loaded."
+        )
+    return {"current_model": current_model_name}
+
+# Data drifting stuff
+
 # Load datasets
 train_images_path = project_root / "data" / "processed" / "train_images.pt"
 if not train_images_path.exists():
     raise FileNotFoundError(f"File {train_images_path} not found.")
 train_images = torch.load(train_images_path)
-print(type(train_images))
-print(train_images.shape)
 
 # Function to preprocess images and get CLIP embeddings
 def get_clip_embeddings(images, clip_model, processor, batch_size=32):
@@ -186,7 +287,7 @@ async def predict_pneumonia(file: UploadFile = File(...)):
     # Perform prediction for pneumonia classification
     with torch.no_grad():
         output = model(image_tensor)
-        predicted = (torch.sigmoid(output) > 0.5).int()
+        predicted = torch.sigmoid(output) > 0.5
         label = true_labels[predicted.item()]
 
     # Prepare the image for CLIP (no need to transform)
@@ -213,17 +314,20 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run("src.mlops_project.api:app", host="0.0.0.0", port=8000, reload=True)
 
+    """
+    Commands:
+    # Get current model
+    curl -X GET "http://localhost:8000/models/current"
 
-    # Disclaimer: I cannot get it to work by just running the file
-    # I can however get it to run by running CLI: uvicorn src.mlops_project.api:app --host 0.0.0.0 --port 8000
-    # And then test with an image like so: 
-    # curl -X POST "http://localhost:8000/predict_pneumonia" -H "Content-Type: multipart/form-data" -F "file=@C:\person1_virus_6.JPEG"
-    # In a terminal windows. I got the following output: {"label":"Normal"} 
-    # When Navigating to http://localhost:8000/monitoring it computes the current datadrift.
-    # Its quite slow since we're computing 512 embeddings comparisons, but yeah it should work.
-    # When you predict on a new image it addes the embedding to the current dataset so the more images thats added the bigger drift will occur. 
-    
-    # NEEDS TO BE DONE:
-    # Right way to handle models, but I did put some starting code to pull a trained model from a cloud bucket.
-    # Automatic triggering if the drift in the Data Drift Summary report gets to a certain value.
-    # I'm most likely missing something so add some stuff!
+    # Get current models in buckets and their link name.
+    curl -X GET "http://localhost:8000/models"
+
+    # Predict using model (example)
+    curl -X POST "http://localhost:8000/predict_pneumonia" -H "Content-Type: multipart/form-data" -F "file=@C:\person1_virus_6.JPEG"
+
+    # Switch to a different trained model from list of models in the online bucket (switches from simple to resnet50)
+    curl -X POST "http://localhost:8000/models/select" -H "Content-Type: application/json" -d "{\"model_name\": \"trained_models/trained_resnet50-v7.ckpt\"}"
+
+    # Monitoring for datadrift
+    Opening in browser: http://localhost:8000/monitoring or go http://localhost:8000 and click monitoring dashboard.
+    """
