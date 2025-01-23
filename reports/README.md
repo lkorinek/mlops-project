@@ -451,14 +451,12 @@ will check the repositories and the code to verify your answers.
 
 > **Did you manage to write an API for your model? If yes, explain how you did it and if you did anything special. If**
 > **not, explain how you would do it.**
->
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We did manage to write an API for our model. We used FastAPI to do this. We did this by ... . We also added ...*
-> *to the API to make it more ...*
->
-> Answer:
+> 
+Yes, we did manage to write an API for the model using FastAPI, which provides a user-friendly way to expose model functionality. The API accepts an input image through the /predict_pneumonia endpoint and uses a trained model to predict whether the chest X-ray indicates "Pneumonia" or "Normal." The uploaded image is preprocessed before being passed to the model for prediction.
+
+Additionally, I incorporated data drift detection using the evidently library. The /monitoring endpoint compares embeddings of new input images against a reference dataset of training embeddings to monitor data drift over time. This helps ensure that the model's predictions remain reliable as new data is processed.
+
+In addition, we attempted to incorporate an endpoint that would allow users to select from multiple pretrained and fine-tuned models stored in a Google Cloud Platform (GCP) bucket. This would give users the flexibility to switch between models dynamically. However, we faced issues with accessing and managing models in the GCP bucket, so we could not verify that this specific part of the implementation works as intended. Despite this, the API provides robust functionality for prediction and monitoring.
 
 --- question 23 fill here ---
 
@@ -482,6 +480,8 @@ will check the repositories and the code to verify your answers.
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
 > **the load testing did you get. If not, explain how you would do it.**
+
+> 
 >
 > Recommended answer length: 100-200 words.
 >
@@ -490,6 +490,8 @@ will check the repositories and the code to verify your answers.
 > *before the service crashed.*
 >
 > Answer:
+>
+> We did not perform unit testing for this part of the project. However we included  basic error handling was implemented, such as validating the uploaded file format, ensuring the model is loaded before processing requests, and providing meaningful error messages for invalid inputs. To implement unit testing for this script, we would use the pytest framework, which is well-suited for testing Python applications. Tests would include verifying individual components like image preprocessing, model loading, and the /predict_pneumonia and /monitoring endpoints. Additionally, we woulf include tests for edge cases, such as handling empty inputs or corrupted files. Automated tests could be run in a CI/CD pipeline to maintain reliability.
 
 --- question 25 fill here ---
 
