@@ -129,7 +129,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
-s246710
+s246710, s204118
 
 ### Question 3
 > **A requirement to the project is that you include a third-party package not covered in the course. What framework**
@@ -684,4 +684,4 @@ We did not perform unit testing for this part of the project. However we include
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
-Student s246710 was in charge of conducting hyperparameter sweeps and training in the cloud, which included building and configuring the Docker containers required for the training process. The student was also in charge of continuous integration using GitHub actions such as tests and docker building.
+Student s246710 was in charge of conducting hyperparameter sweeps and training in the cloud, which included building and configuring the Docker containers required for the training process. The student was also in charge of continuous integration using GitHub actions such as tests and docker building. Student s204118 was in charge of implementing train.py and model.py using pytorch-lightning and timm along with hydra configuration setup. The student also helped with implementing data drifting monitoring using Evidently AI reporting.
