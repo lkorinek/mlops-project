@@ -18,8 +18,38 @@ from transformers import CLIPModel, CLIPProcessor
 # Project root to get the models path
 project_root = Path(__file__).resolve().parents[2]
 
-MODEL_FILE_NAME = "trained_resnet50.ckpt" 
-BUCKET_NAME = "your-gcp-bucket-name" # insert bucket name with trained model
+MODEL_FILE_NAME = "trained_resnet50.ckpt"
+BUCKET_NAME = os.getenv("GCP_BUCKET_NAME", "your-gcp-bucket-name")  # Update with your bucket name
+
+# Initialize global variables for CLIP model and processor
+clip_model = None
+processor = None
+
+# Image transformation pipeline
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+])
+
+# Data drift stuff
+
+# Function to initialize CLIP model and processor
+def initialize_clip():
+    global clip_model, processor
+    if clip_model is None or processor is None:
+        print("Loading CLIP model and processor...")
+        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+        processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+        print("CLIP model and processor loaded.")
+
+# Function to download model from GCP
+def download_model_from_gcp(destination_path):
+    """Download the model file from a GCP bucket."""
+    client = storage.Client()
+    bucket = client.bucket(BUCKET_NAME)
+    blob = bucket.blob(MODEL_FILE_NAME)
+    blob.download_to_filename(destination_path)
+    print(f"Model {MODEL_FILE_NAME} downloaded from GCP bucket {BUCKET_NAME}.")
 
 async def lifespan(app: FastAPI):
     """
@@ -29,11 +59,10 @@ async def lifespan(app: FastAPI):
     print("Loading model...")
     trained_model_path = project_root / "models" / MODEL_FILE_NAME
 
-    # Starting code for gloud storage of trained model
-
-    # if not trained_model_path.exists():
-    #     print(f"Model file {MODEL_FILE_NAME} not found locally. Downloading from GCP...")
-    #     download_model_from_gcp(trained_model_path)
+    # If the model is not found locally, download it from GCP
+    if not trained_model_path.exists():
+        print(f"Model file {MODEL_FILE_NAME} not found locally. Downloading from GCP...")
+        download_model_from_gcp(trained_model_path)
 
     # Ensure the model file exists
     if trained_model_path.suffix == ".ckpt":
@@ -52,73 +81,65 @@ async def lifespan(app: FastAPI):
     print("Cleaning up...")
     del model
 
-def download_model_from_gcp(destination_path):
-    """Download the model file from a GCP bucket."""
-    client = storage.Client()
-    bucket = client.bucket(BUCKET_NAME)
-    blob = bucket.blob(MODEL_FILE_NAME)
-    blob.download_to_filename(destination_path)
-    print(f"Model {MODEL_FILE_NAME} downloaded from GCP bucket {BUCKET_NAME}.")
-
 app = FastAPI(lifespan=lifespan)
 
-# Image transformation pipeline
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-])
-
-# Data drift stuff
-
-# Load CLIP model and processor
-print("Loading CLIP model and processor...")
-clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-print("Model and processor loaded.")
-
 # Load datasets
-train_images = torch.load(project_root / "data" / "processed" / "train_images.pt", weights_only=True)
+train_images_path = project_root / "data" / "processed" / "train_images.pt"
+if not train_images_path.exists():
+    raise FileNotFoundError(f"File {train_images_path} not found.")
+train_images = torch.load(train_images_path)
+print(type(train_images))
+print(train_images.shape)
 
 # Function to preprocess images and get CLIP embeddings
-def get_clip_embeddings(images, batch_size=32):
+def get_clip_embeddings(images, clip_model, processor, batch_size=32):
     """Process images and extract CLIP embeddings."""
     embeddings = []
     for i in range(0, len(images), batch_size):
         batch = images[i : i + batch_size]
-        pil_images = []
-        for img in batch:
-            # Convert 1x1x224 (single channel) or similar shapes to [height, width, channels]
-            img = img.squeeze()  # Remove singleton dimensions (e.g., 1x1x224 -> 224)
-            if img.ndim == 2:  # Grayscale images
-                img = np.stack([img] * 3, axis=-1)  # Convert to RGB by duplicating channels
-            elif img.ndim == 3 and img.shape[0] in [1, 3]:  # Channels first
-                img = img.transpose(1, 2, 0)  # Convert to height x width x channels
-            
-            # Convert to uint8 and PIL image
-            img = (img * 255).clip(0, 255).astype("uint8")
-            pil_images.append(Image.fromarray(img))
+        batch_tensor = torch.tensor(batch, dtype=torch.float32) / 255.0
+        if batch_tensor.ndim == 4 and batch_tensor.shape[1] == 3:
+            batch_tensor = batch_tensor.permute(0, 2, 3, 1)
         
-        # Process with CLIP
+        # Convert to PIL (Processor expects PIL images)
+        pil_images = [Image.fromarray((img.numpy() * 255).astype("uint8")) for img in batch_tensor]
+
+        # Use CLIP processor for pre-mebeddings
         inputs = processor(images=pil_images, return_tensors="pt", padding=True)
+
         with torch.no_grad():
             batch_embeddings = clip_model.get_image_features(inputs["pixel_values"])
-        embeddings.append(batch_embeddings.numpy())
+        embeddings.append(batch_embeddings.cpu().numpy())
     
     return np.vstack(embeddings)
 
-# Initialize drift-related variables
-train_embeddings = np.array([])  # This will be populated with train dataset embeddings
+# Assuming `train_images` is a PyTorch tensor of shape (N, 3, H, W)
+train_images_np = train_images.cpu().numpy()  # Convert to NumPy array if needed
 
-# Initialize your training embeddings
-print("Getting training embeddings for drift detection..")
-train_embeddings = get_clip_embeddings(train_images.numpy()) 
+# Generate CLIP embeddings for the training dataset
+initialize_clip()  # Load CLIP model and processor
+print("Getting training embeddings for drift detection...")
+train_embeddings = get_clip_embeddings(train_images_np, clip_model, processor)
+
+# Create reference DataFrame for drift detection
 reference_df = pd.DataFrame(train_embeddings, columns=[f"Feature_{i}" for i in range(train_embeddings.shape[1])])
 reference_df["Dataset"] = "X-RAY"
 print("Reference dataset created.")
-# Initialize current_df as a copy of reference_df (our starting data)
-current_df = reference_df.copy()  # current_df that gets new data added.
-current_df["Dataset"] = "Current"  
 
+# Initialize `current_df` as a copy of `reference_df`
+current_df = reference_df.copy()
+current_df["Dataset"] = "Current"
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return """
+    <h1>Welcome to the Pneumonia Detection API</h1>
+    <p>Use the following endpoints:</p>
+    <ul>
+        <li><a href="/docs">Interactive Docs (Swagger)</a></li>
+        <li><a href="/monitoring">Monitoring Dashboard</a></li>
+    </ul>
+    """
 
 @app.get("/monitoring", response_class=HTMLResponse)
 async def xray_monitoring():
@@ -138,17 +159,15 @@ async def xray_monitoring():
     report.save_html("monitoring.html")
 
     async with await anyio.open_file("monitoring.html", encoding="utf-8") as f:
-        html_content = await f.read() # Loads page (slowly)
+        html_content = await f.read()  # Loads page (slowly)
 
     return HTMLResponse(content=html_content, status_code=200)
-
 
 # Define class labels
 true_labels = ["Normal", "Pneumonia"]
 
 @app.post("/predict_pneumonia")
 async def predict_pneumonia(file: UploadFile = File(...)):
-
     """
     Predict whether an uploaded chest X-ray image indicates pneumonia or is normal.
     """
@@ -185,15 +204,15 @@ async def predict_pneumonia(file: UploadFile = File(...)):
     new_embedding["Dataset"] = "Current"
 
     # Add the new embedding to the current DataFrame
-    global current_df 
+    global current_df
     current_df = pd.concat([current_df, new_embedding], ignore_index=True)
 
     return JSONResponse(content={"label": label})
 
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("src.mlops_project.api:app", host="0.0.0.0", port=8000, reload=True)
+
 
     # Disclaimer: I cannot get it to work by just running the file
     # I can however get it to run by running CLI: uvicorn src.mlops_project.api:app --host 0.0.0.0 --port 8000
