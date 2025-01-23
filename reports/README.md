@@ -251,7 +251,15 @@ While the project structure included notebooks and models (stored our trained mo
 >
 > Answer:
 
---- question 9 fill here ---
+We used branches couple times during the project, but since team members worked
+on separate parts that didn’t impact each other, it was simpler to just work on the main
+branch. However, there were pull requests created by Dependabot for dependency updates.
+
+Branches are useful when working on bigger parts of a project that involve multiple
+partial commits. These commits may not be fully functional on their own and could
+potentially break other parts of the project until the entire update is completed.
+Using branches in such scenarios helps maintain the stability of the main branch
+while allowing for partial versioning.
 
 ### Question 10
 
@@ -266,7 +274,12 @@ While the project structure included notebooks and models (stored our trained mo
 >
 > Answer:
 
---- question 10 fill here ---
+We made use of DVC in the project. In the end it helped us to build the docker in the cloud
+by being able to easily download the data from the Google Cloud Bucket using the DVC pull
+command. Having version control did not really improve the project since we did not change
+the data during the project development. But if we worked on this project for longer it
+would help us identify the version of the dataset used in experiments. It is also useful
+when working in a team, ensuring that all members are working with the same version of the dataset.
 
 ### Question 11
 
@@ -283,7 +296,29 @@ While the project structure included notebooks and models (stored our trained mo
 >
 > Answer:
 
---- question 11 fill here ---
+Our continuous integration setup uses GitHub Actions. The workflow consists of two main
+jobs: test and build, which run on different triggers such as pushes to the main branch
+or pull requests.
+
+The CI pipeline runs unit tests using pytest with coverage tracking.
+The test job executes the tests targeting multiple operating systems - Ubuntu,
+Windows, and macOS, to ensure platform compatibility. The project
+uses Python 3.11 so the tests are run using this version. To speed up the pipeline
+the test are not run for other versions. This allows us to verify that our code
+functions consistently across different environments. the tests, of course,
+are providing the minimal requirements to ensure basic functionality, they are not
+sufficient on their own for comprehensive validation.
+
+As part of the test job, we use Ruff for code formatting to enforce consistent
+style and maintain code standards.
+
+After successful testing, the build job is run. It authenticates with Google Cloud using
+a secure key stored in GitHub Secrets. The workflow submits the build using a
+Cloud Build configuration file - configs/cloudbuild.yaml.
+
+We make use of pip caching for dependencies reducing the pipeline running time.
+
+An example of a triggered workflow can be seen [here](https://github.com/lkorinek/mlops-project/actions/runs/12929411230).
 
 ## Running code and tracking experiments
 
