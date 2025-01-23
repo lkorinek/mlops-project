@@ -141,7 +141,7 @@ will check the repositories and the code to verify your answers.
 > *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
 > *package to do ... and ... in our project*.
 >
-> Answer:
+> Answer: We used torchvision framework for this project. More specifically we utilized pre-trained models from PyTorch’s image models framework, such as ResNet50, VGG16, and DenseNet, to improve classification accuracy. We used the encoder part of those models and performed fine-tuning in the classification for our specific task by adapting the final layers to classify X-ray images into two categories: Pneumonia and Normal. Torchvision is a usefull tool for accessing pre-trained models and data augmentation. Lastly we used torch.optim for optimization, evaluating the models based on accuracy, precision, recall, and F1-score.
 
 --- question 3 fill here ---
 
@@ -177,8 +177,11 @@ will check the repositories and the code to verify your answers.
 > *because we did not use any ... in our project. We have added an ... folder that contains ... for running our*
 > *experiments.*
 >
-> Answer:
-
+> Answer: We started the project using Cookiecutter with a template designed for the MLOps course by our professor. This provided a solid foundation and an organized structure for building all the necessary components.
+> The core of the project resides in the src folder, which includes the source code for data loading (data.py), model definition and training (model.py), and the API implementation. The config folder contains essential configurations to run the project in the cloud, including all required dependencies, while the docker folder holds Dockerfiles for tasks like training the model, deploying the project in the cloud, and running the API. We placed all the necessary tests for data loading and model training in the test folder, ensuring functionality and reliability. Additionally, we set up Data Version Control (DVC) to track and manage the dataset stored in a cloud bucket, enabling reproducibility and efficient data handling.
+> While the project structure included notebooks and models (stored our trained models via sweep in W&B) folders, we didn’t use them for this specific implementation.
+>
+> 
 --- question 5 fill here ---
 
 ### Question 6
@@ -340,6 +343,13 @@ will check the repositories and the code to verify your answers.
 > *training docker image: `docker run trainer:latest lr=1e-3 batch_size=64`. Link to docker file: <weblink>*
 >
 > Answer:
+> During the training phase, Docker is used to create a containerized environment that encapsulates both the training dataset and the training script. This approach guarantees consistency and reproducibility of the training process across various environments. For the inference phase, a containerized environment is set up to include the trained model and the inference script, enabling deployment to different platforms. In the deployment phase, this containerized environment is deployed to a production setting, such as a cloud service or a local server, ensuring that the model operates in a consistent and reliable environment. This strategy facilitates seamless scaling and simplifies the management of the deployed model.
+>To run the Docker images, we would first build the image using the following command in the terminal:
+> docker build -t training-image -f dockerfiles/train.dockerfile .
+> After building the image, the container can be run using the docker run command:
+> docker run --rm -it training-image
+> The Dockerfile used for the training phase is available at the following link:
+> link : https://github.com/lkorinek/mlops-project/blob/main/dockerfiles/train.dockerfile
 
 --- question 15 fill here ---
 
