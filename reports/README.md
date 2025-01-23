@@ -48,42 +48,42 @@ will check the repositories and the code to verify your answers.
 
 ### Week 1
 
-* [ ] Create a git repository (M5)
-* [ ] Make sure that all team members have write access to the GitHub repository (M5)
-* [ ] Create a dedicated environment for you project to keep track of your packages (M2)
-* [ ] Create the initial file structure using cookiecutter with an appropriate template (M6)
-* [ ] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
-* [ ] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
-* [ ] Remember to fill out the `requirements.txt` and `requirements_dev.txt` file with whatever dependencies that you
+* [x] Create a git repository (M5)
+* [x] Make sure that all team members have write access to the GitHub repository (M5)
+* [x] Create a dedicated environment for you project to keep track of your packages (M2)
+* [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
+* [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
+* [x] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
+* [x] Remember to fill out the `requirements.txt` and `requirements_dev.txt` file with whatever dependencies that you
     are using (M2+M6)
-* [ ] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
-* [ ] Do a bit of code typing and remember to document essential parts of your code (M7)
-* [ ] Setup version control for your data or part of your data (M8)
-* [ ] Add command line interfaces and project commands to your code where it makes sense (M9)
-* [ ] Construct one or multiple docker files for your code (M10)
-* [ ] Build the docker files locally and make sure they work as intended (M10)
-* [ ] Write one or multiple configurations files for your experiments (M11)
-* [ ] Used Hydra to load the configurations and manage your hyperparameters (M11)
+* [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
+* [x] Do a bit of code typing and remember to document essential parts of your code (M7)
+* [x] Setup version control for your data or part of your data (M8)
+* [x] Add command line interfaces and project commands to your code where it makes sense (M9)
+* [x] Construct one or multiple docker files for your code (M10)
+* [x] Build the docker files locally and make sure they work as intended (M10)
+* [x] Write one or multiple configurations files for your experiments (M11)
+* [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
 * [ ] Use profiling to optimize your code (M12)
-* [ ] Use logging to log important events in your code (M14)
-* [ ] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
-* [ ] Consider running a hyperparameter optimization sweep (M14)
-* [ ] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
+* [x] Use logging to log important events in your code (M14)
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
+* [x] Consider running a hyperparameter optimization sweep (M14)
+* [x] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
 
 ### Week 2
 
-* [ ] Write unit tests related to the data part of your code (M16)
-* [ ] Write unit tests related to model construction and or model training (M16)
-* [ ] Calculate the code coverage (M16)
-* [ ] Get some continuous integration running on the GitHub repository (M17)
-* [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
-* [ ] Add pre-commit hooks to your version control setup (M18)
+* [x] Write unit tests related to the data part of your code (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
+* [x] Calculate the code coverage (M16)
+* [x] Get some continuous integration running on the GitHub repository (M17)
+* [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
+* [x] Add pre-commit hooks to your version control setup (M18)
 * [ ] Add a continues workflow that triggers when data changes (M19)
 * [ ] Add a continues workflow that triggers when changes to the model registry is made (M19)
-* [ ] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
-* [ ] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
+* [x] Create a trigger workflow for automatically building your docker images (M21)
+* [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [ ] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
 * [ ] Write API tests for your application and setup continues integration for these (M24)
@@ -109,7 +109,7 @@ will check the repositories and the code to verify your answers.
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
 * [ ] Create an architectural diagram over your MLOps pipeline
 * [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -118,7 +118,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 1 fill here ---
+70
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -129,7 +129,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 2 fill here ---
+s246710
 
 ### Question 3
 > **A requirement to the project is that you include a third-party package not covered in the course. What framework**
@@ -141,9 +141,15 @@ will check the repositories and the code to verify your answers.
 > *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
 > *package to do ... and ... in our project*.
 >
-> Answer: We used torchvision framework for this project. More specifically we utilized pre-trained models from PyTorch’s image models framework, such as ResNet50, VGG16, and DenseNet, to improve classification accuracy. We used the encoder part of those models and performed fine-tuning in the classification for our specific task by adapting the final layers to classify X-ray images into two categories: Pneumonia and Normal. Torchvision is a usefull tool for accessing pre-trained models and data augmentation. Lastly we used torch.optim for optimization, evaluating the models based on accuracy, precision, recall, and F1-score.
+> Answer:
 
---- question 3 fill here ---
+We used torchvision framework for this project. More specifically we utilized pre-trained
+models from PyTorch’s image models framework, such as ResNet50, VGG16, and DenseNet, to
+improve classification accuracy. We used the encoder part of those models and performed
+fine-tuning in the classification for our specific task by adapting the final layers to
+classify X-ray images into two categories: Pneumonia and Normal. Torchvision is a useful
+tool for accessing pre-trained models and data augmentation. Lastly we used torch.optim
+for optimization, evaluating the models based on accuracy, precision, recall, and F1-score.
 
 ## Coding environment
 
@@ -162,9 +168,8 @@ will check the repositories and the code to verify your answers.
 > *complete copy of our development environment, one would have to run the following commands*
 >
 > Answer:
-> We used Conda, Docker, DVC, and Git to manage our project dependencies effectively. A Conda environment was created to ensure project dependencies remained isolated and did not interfere with other projects. Dependencies are explicitly listed in requirements.txt and pyproject.toml. Finally, version control was managed with Git. A new team member would be invited to join the github repository, clone it, and run the docker file via CLI docker “build -f Docker.dockerfile . -t trainer:latest”
 
---- question 4 fill here ---
+We used Conda, Docker, DVC, and Git to manage our project dependencies effectively. A Conda environment was created to ensure project dependencies remained isolated and did not interfere with other projects. Dependencies are explicitly listed in requirements.txt and pyproject.toml. Finally, version control was managed with Git. A new team member would be invited to join the github repository, clone it, and run the docker file via CLI docker “build -f Docker.dockerfile . -t trainer:latest”
 
 ### Question 5
 
@@ -178,12 +183,11 @@ will check the repositories and the code to verify your answers.
 > *because we did not use any ... in our project. We have added an ... folder that contains ... for running our*
 > *experiments.*
 >
-> Answer: We started the project using Cookiecutter with a template designed for the MLOps course by our professor. This provided a solid foundation and an organized structure for building all the necessary components.
-> The core of the project resides in the src folder, which includes the source code for data loading (data.py), model definition and training (model.py), and the API implementation. The config folder contains essential configurations to run the project in the cloud, including all required dependencies, while the docker folder holds Dockerfiles for tasks like training the model, deploying the project in the cloud, and running the API. We placed all the necessary tests for data loading and model training in the test folder, ensuring functionality and reliability. Additionally, we set up Data Version Control (DVC) to track and manage the dataset stored in a cloud bucket, enabling reproducibility and efficient data handling.
-> While the project structure included notebooks and models (stored our trained models via sweep in W&B) folders, we didn’t use them for this specific implementation.
->
-> 
---- question 5 fill here ---
+> Answer:
+
+We started the project using Cookiecutter with a template designed for the MLOps course by our professor. This provided a solid foundation and an organized structure for building all the necessary components.
+The core of the project resides in the src folder, which includes the source code for data loading (data.py), model definition and training (model.py), and the API implementation. The config folder contains essential configurations to run the project in the cloud, including all required dependencies, while the docker folder holds Dockerfiles for tasks like training the model, deploying the project in the cloud, and running the API. We placed all the necessary tests for data loading and model training in the test folder, ensuring functionality and reliability. Additionally, we set up Data Version Control (DVC) to track and manage the dataset stored in a cloud bucket, enabling reproducibility and efficient data handling.
+While the project structure included notebooks and models (stored our trained models via sweep in W&B) folders, we didn’t use them for this specific implementation.
 
 ### Question 6
 
@@ -297,10 +301,9 @@ will check the repositories and the code to verify your answers.
 > *We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25*
 >
 > Answer:
-> We used Typer, a Python library for building command-line interfaces, to manage and configure the data processing part of the project. Typer made it easy to set up and run experiments by allowing us to specify parameters directly from the command line. For example, the script src/mlops_project/data.py can be run in the terminal by specifying the input data directory and the output directory for the processed data. python data.py raw_dir processed_dir --percentage 0.8
->  For the training part of the project, we used Hydra along with a configuration file to manage parameters like learning rate, weight decay, batch size, and the number of epochs. This setup helped streamline the process, ensuring the project was well-organized, reproducible, and easy to work with.
 
---- question 12 fill here ---
+We used Typer, a Python library for building command-line interfaces, to manage and configure the data processing part of the project. Typer made it easy to set up and run experiments by allowing us to specify parameters directly from the command line. For example, the script src/mlops_project/data.py can be run in the terminal by specifying the input data directory and the output directory for the processed data. python data.py raw_dir processed_dir --percentage 0.8
+For the training part of the project, we used Hydra along with a configuration file to manage parameters like learning rate, weight decay, batch size, and the number of epochs. This setup helped streamline the process, ensuring the project was well-organized, reproducible, and easy to work with.
 
 ### Question 13
 
@@ -332,7 +335,29 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 14 fill here ---
+In W&B we have run the hyperparameter optimization sweep as can be seen in the first
+figure. During the sweep process, hyperparameters (batch size, number of epochs and learning rate)
+were altered in each run. The objective of the sweep was to minimize the training loss.
+The first figure shows multiple runs from the hyperparameter sweep,
+visualizing the relationship between different configurations of batch size,
+number of epochs, and learning rate. These configurations are mapped to metrics such
+as training loss and test accuracy.
+
+![](figures/wandb_sweep_summary.png)
+
+We tracked training and validation loss as well as training and validation accuracy,
+as shown in the second figure. These metrics are important for checking the performance
+of the model. The training and validation loss help us evaluate how well the model is
+learning and training and validation accuracy shows how well the model predicts.
+Using these we can identify whether the model is underfitting or overfitting allowing
+us to adjust hyperparameters for better results. The test accuracy is also evaluated at the
+end of each run.
+
+![](figures/wandb_sweep_acc_loss.png)
+
+Together, these figures provide an overview of how different hyperparameters
+impact model training and the final accuracy. It helps with selecting the best
+hyperparameter configuration which would be a tedious task without using such a tool.
 
 ### Question 15
 
@@ -346,15 +371,36 @@ will check the repositories and the code to verify your answers.
 > *training docker image: `docker run trainer:latest lr=1e-3 batch_size=64`. Link to docker file: <weblink>*
 >
 > Answer:
-> During the training phase, Docker is used to create a containerized environment that encapsulates both the training dataset and the training script. This approach guarantees consistency and reproducibility of the training process across various environments. For the inference phase, a containerized environment is set up to include the trained model and the inference script, enabling deployment to different platforms. In the deployment phase, this containerized environment is deployed to a production setting, such as a cloud service or a local server, ensuring that the model operates in a consistent and reliable environment. This strategy facilitates seamless scaling and simplifies the management of the deployed model.
->To run the Docker images, we would first build the image using the following command in the terminal:
-> docker build -t training-image -f dockerfiles/train.dockerfile .
-> After building the image, the container can be run using the docker run command:
-> docker run --rm -it training-image
-> The Dockerfile used for the training phase is available at the following link:
-> link : https://github.com/lkorinek/mlops-project/blob/main/dockerfiles/train.dockerfile
 
---- question 15 fill here ---
+During the training phase, Docker is used to create a containerized environment that
+encapsulates both the training dataset and the training script. This approach guarantees
+consistency and reproducibility of the training process across various environments.
+
+For our project, we developed two Docker images: one for training and another for running hyperparameter sweeps.
+There are two ways to build the training Docker image:
+
+1. Using docker build:
+```bash
+docker build . --build-arg 'DEFAULT_JSON=<data-bucket-key>' -f dockerfiles/train.dockerfile -t train:latest
+```
+This command takes a build argument DEFAULT_JSON that specifies the key to access your data
+stored in a Google Cloud bucket. <data-bucket-key> needs to be replaced with the actual key.
+
+2. Using invoke:
+```bash
+invoke docker-build
+```
+it expects the data bucket key to be saved in the **default.json** file.
+
+The docker train image can be run using
+```bash
+invoke docker-train
+```
+
+The scripts can be found in [tasks.py](https://github.com/lkorinek/mlops-project/blob/main/tasks.py)
+
+Link to docker file:
+[train.dockerfile](https://github.com/lkorinek/mlops-project/blob/main/dockerfiles/train.dockerfile)
 
 ### Question 16
 
@@ -410,7 +456,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 19 fill here ---
+![](figures/gcloud_buckets.png)
 
 ### Question 20
 
@@ -419,7 +465,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 20 fill here ---
+![](figures/gcloud_artifact_registery.png)
 
 ### Question 21
 
@@ -428,7 +474,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
---- question 21 fill here ---
+![](figures/gcloud_builds.png)
 
 ### Question 22
 
@@ -451,14 +497,20 @@ will check the repositories and the code to verify your answers.
 
 > **Did you manage to write an API for your model? If yes, explain how you did it and if you did anything special. If**
 > **not, explain how you would do it.**
-> 
+>
+> Recommended answer length: 100-200 words.
+>
+> Example:
+> *We did manage to write an API for our model. We used FastAPI to do this. We did this by ... . We also added ...*
+> *to the API to make it more ...*
+>
+> Answer:
+
 Yes, we did manage to write an API for the model using FastAPI, which provides a user-friendly way to expose model functionality. The API accepts an input image through the /predict_pneumonia endpoint and uses a trained model to predict whether the chest X-ray indicates "Pneumonia" or "Normal." The uploaded image is preprocessed before being passed to the model for prediction.
 
 Additionally, I incorporated data drift detection using the evidently library. The /monitoring endpoint compares embeddings of new input images against a reference dataset of training embeddings to monitor data drift over time. This helps ensure that the model's predictions remain reliable as new data is processed.
 
 In addition, we attempted to incorporate an endpoint that would allow users to select from multiple pretrained and fine-tuned models stored in a Google Cloud Platform (GCP) bucket. This would give users the flexibility to switch between models dynamically. However, we faced issues with accessing and managing models in the GCP bucket, so we could not verify that this specific part of the implementation works as intended. Despite this, the API provides robust functionality for prediction and monitoring.
-
---- question 23 fill here ---
 
 ### Question 24
 
@@ -480,8 +532,7 @@ In addition, we attempted to incorporate an endpoint that would allow users to s
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
 > **the load testing did you get. If not, explain how you would do it.**
-
-> 
+>
 >
 > Recommended answer length: 100-200 words.
 >
@@ -490,10 +541,8 @@ In addition, we attempted to incorporate an endpoint that would allow users to s
 > *before the service crashed.*
 >
 > Answer:
->
-> We did not perform unit testing for this part of the project. However we included  basic error handling was implemented, such as validating the uploaded file format, ensuring the model is loaded before processing requests, and providing meaningful error messages for invalid inputs. To implement unit testing for this script, we would use the pytest framework, which is well-suited for testing Python applications. Tests would include verifying individual components like image preprocessing, model loading, and the /predict_pneumonia and /monitoring endpoints. Additionally, we woulf include tests for edge cases, such as handling empty inputs or corrupted files. Automated tests could be run in a CI/CD pipeline to maintain reliability.
 
---- question 25 fill here ---
+We did not perform unit testing for this part of the project. However we included  basic error handling was implemented, such as validating the uploaded file format, ensuring the model is loaded before processing requests, and providing meaningful error messages for invalid inputs. To implement unit testing for this script, we would use the pytest framework, which is well-suited for testing Python applications. Tests would include verifying individual components like image preprocessing, model loading, and the /predict_pneumonia and /monitoring endpoints. Additionally, we woulf include tests for edge cases, such as handling empty inputs or corrupted files. Automated tests could be run in a CI/CD pipeline to maintain reliability.
 
 ### Question 26
 
@@ -592,4 +641,4 @@ In addition, we attempted to incorporate an endpoint that would allow users to s
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s246710 was in charge of conducting hyperparameter sweeps and training in the cloud, which included building and configuring the Docker containers required for the training process. The student was also in charge of continuous integration using GitHub actions such as tests and docker building.
