@@ -1,6 +1,6 @@
 torch==2.5.1
 typer==0.15.1
-fastapi==0.115.6
+fastapi==0.115.7
 uvicorn==0.34.0
 numpy==2.2.2
 torchvision==0.20.1
