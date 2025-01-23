@@ -489,7 +489,15 @@ Link to docker file:
 >
 > Answer:
 
---- question 22 fill here ---
+We successfully trained our model in the cloud using Vertex AI, where we performed a
+hyperparameter sweep. To enable this, we created a script located at scripts/run_sweep.py
+to initialize the W&B sweep. A Docker image for this script was built in the cloud, stored
+in the artifact repository, and used for execution on Vertex AI. Additionally,
+the wandb-api-key was securely stored in the cloud's secrets using Google Secret Manager
+and injected into the Vertex AI configuration file at runtime. Then it was securely passed
+as an environment variable without exposing sensitive information. The integration of
+Google Secret Manager with Vertex AI enabled a secure, efficient, and scalable workflow
+for hyperparameter optimization.
 
 ## Deployment
 
