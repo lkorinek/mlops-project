@@ -117,7 +117,7 @@ def train(config) -> None:
         verbose=True,
         monitor="val_loss",
         mode="min",  # Save when validation loss is minimized
-        every_n_epochs=1,
+        every_n_epochs=2,
     )
     # Trainer with WANDB logging
     trainer = pl.Trainer(
@@ -126,6 +126,7 @@ def train(config) -> None:
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         logger=wandb_logger,
         callbacks=[checkpoint_callback],
+        log_every_n_steps=20,
     )
 
     trainer.fit(model, train_dataloader, val_dataloader)

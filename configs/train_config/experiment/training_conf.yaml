@@ -2,8 +2,8 @@
 n_epochs: 1
 batch_size: 16
 lr: 0.01
-wd: 0.01 
-seed: 42 
+wd: 0.01
+seed: 42
 model_name: "simple" # models: resnet50, vgg16, densenet121 and simple
-num_workers: 4
-persistent_workers: True # Keep those workers working and remember to look out for unionization!  
+num_workers: 2
+persistent_workers: True # Keep those workers working and remember to look out for unionization!

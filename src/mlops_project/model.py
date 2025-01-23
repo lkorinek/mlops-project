@@ -86,18 +86,16 @@ class Model(pl.LightningModule):
         loss = self.criterion(outputs.squeeze(), targets.float())
         self.train_losses.append(loss.item())
         acc = self.accuracy(outputs.squeeze(), targets.float())
-        if self.trainer and self.trainer.logger:
-            self.log("train_loss", loss.item(), on_step=True, on_epoch=True, prog_bar=True, logger=True)
-            self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
-            # self.log("train_acc_epoch", self.accuracy, on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_loss", loss.item(), prog_bar=True)
+        self.log("train_acc", acc, prog_bar=True)
+
         return loss
 
     def on_train_epoch_end(self):
         avg_loss = sum(self.train_losses) / len(self.train_losses)
-        if self.trainer and self.trainer.logger:  # Logging only if trainer is available
-            self.log("avg_train_loss", avg_loss, logger=True)
-        self.train_losses.clear()
+        self.log("epoch_avg_loss", avg_loss, prog_bar=True)
+        self.train_losses = []  # Clear losses for the next epoch
 
     def validation_step(self, batch, batch_idx):
         data, targets = batch
@@ -111,20 +109,8 @@ class Model(pl.LightningModule):
         self.recall(preds.squeeze().float(), targets.float())
         self.f1(preds.squeeze().float(), targets.float())
 
-        if self.trainer and self.trainer.logger:
-            self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-            self.log("val_acc", self.accuracy, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-            self.log("val_precision", self.precision, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-            self.log("val_recall", self.recall, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-            self.log("val_f1", self.f1, on_step=False, on_epoch=True, prog_bar=True, logger=True)
-
-        return {
-            "val_loss": loss,
-            "val_acc": self.accuracy,
-            "val_precision": self.precision,
-            "val_recall": self.recall,
-            "val_f1": self.f1,
-        }
+        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_acc", self.accuracy, prog_bar=True)
 
     def test_step(self, batch, batch_idx):
         data, targets = batch
@@ -138,20 +124,8 @@ class Model(pl.LightningModule):
         self.recall(targets, preds.squeeze())
         self.f1(targets, preds.squeeze())
 
-        if self.trainer and self.trainer.logger:
-            self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-            self.log("test_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-            self.log("test_precision", self.precision, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-            self.log("test_recall", self.recall, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-            self.log("test_f1", self.f1, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-
-        return {
-            "test_loss": loss,
-            "test_acc": self.accuracy,
-            "test_precision": self.precision,
-            "test_recall": self.recall,
-            "test_f1": self.f1,
-        }
+        self.log("test_loss", loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
+        self.log("test_acc", self.accuracy, on_step=False, on_epoch=True, prog_bar=False, logger=True)
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.wd)
