@@ -162,6 +162,7 @@ will check the repositories and the code to verify your answers.
 > *complete copy of our development environment, one would have to run the following commands*
 >
 > Answer:
+> We used Conda, Docker, DVC, and Git to manage our project dependencies effectively. A Conda environment was created to ensure project dependencies remained isolated and did not interfere with other projects. Dependencies are explicitly listed in requirements.txt and pyproject.toml. Finally, version control was managed with Git. A new team member would be invited to join the github repository, clone it, and run the docker file via CLI docker “build -f Docker.dockerfile . -t trainer:latest”
 
 --- question 4 fill here ---
 
@@ -296,6 +297,8 @@ will check the repositories and the code to verify your answers.
 > *We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25*
 >
 > Answer:
+> We used Typer, a Python library for building command-line interfaces, to manage and configure the data processing part of the project. Typer made it easy to set up and run experiments by allowing us to specify parameters directly from the command line. For example, the script src/mlops_project/data.py can be run in the terminal by specifying the input data directory and the output directory for the processed data. python data.py raw_dir processed_dir --percentage 0.8
+>  For the training part of the project, we used Hydra along with a configuration file to manage parameters like learning rate, weight decay, batch size, and the number of epochs. This setup helped streamline the process, ensuring the project was well-organized, reproducible, and easy to work with.
 
 --- question 12 fill here ---
 
