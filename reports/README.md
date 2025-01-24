@@ -603,9 +603,24 @@ In addition, we attempted to incorporate an endpoint that would allow users to s
 > *worked. Afterwards we deployed it in the cloud, using ... . To invoke the service an user would call*
 > *`curl -X POST -F "file=@file.json"<weburl>`*
 >
-> Answer:
+> Answer: We implemented our API using FastAPI and deployed it using Google Cloud Run. Initially, we experimented locally by running the API in a terminal window, serving it on localhost, and testing its functionality. Once verified, we pushed the API to Google Cloud Artifact Registry and deployed it to Cloud Run. For continuous deployment, we configured Cloud Build to automatically build and deploy the service whenever changes are pushed to GitHub.
 
---- question 24 fill here ---
+The API dynamically loads models stored in a Google Cloud Storage bucket, with a default model loaded at startup. It also monitors data drift by updating the distribution as new predictions are added. 
+
+The API can be accessed at https://gcp-app-241144182561.europe-west1.run.app/. 
+Commands include:
+
+Get the current model:
+curl -X GET "https://gcp-app-241144182561.europe-west1.run.app/models/current"
+List models in the bucket:
+curl -X GET "https://gcp-app-241144182561.europe-west1.run.app/models"
+Switch models:
+curl -X POST "https://gcp-app-241144182561.europe-west1.run.app/models/select" -H "Content-Type: application/json" -d '{"model_name": "trained_models/trained_resnet50-v7.ckpt"}'
+Make predictions:
+curl -X POST "https://gcp-app-241144182561.europe-west1.run.app/predict_pneumonia" -H "Content-Type: multipart/form-data" -F "file=@/path/to/image.jpg"
+Check for data drift navigate to:
+https://gcp-app-241144182561.europe-west1.run.app/monitoring
+
 
 ### Question 25
 
@@ -636,7 +651,8 @@ We did not perform unit testing for this part of the project. However we include
 >
 > Answer:
 
---- question 26 fill here ---
+We did implement a form of monitoring using Evidently AI and using CLIP to compute our image data feature embeddings. These embeddings were used to get the initial reference data distribution that we would use to compare current data to. The API has an inference feature where images can be uploaded and predicted using our models. These images' feature embeddings are added to the current data distribution. With enough new images the distribution might start drifting from the reference distribution signaling a time to retrain. 
+We would have liked to implement a more feature proof API where multiple data could be uploaded at once with inference. A feature for automatic retraining at a specific datadrift threshold would also have been a nice to have with automatic updating of the dataset.  
 
 ## Overall discussion of project
 
@@ -655,7 +671,8 @@ We did not perform unit testing for this part of the project. However we include
 >
 > Answer:
 
---- question 27 fill here ---
+s204118 spent 43 dkk with most going towards VM testing. 
+
 
 ### Question 28
 
@@ -669,9 +686,8 @@ We did not perform unit testing for this part of the project. However we include
 > *We implemented a frontend for our API. We did this because we wanted to show the user ... . The frontend was*
 > *implemented using ...*
 >
-> Answer:
+> Answer: We did start on a frontend using streamlit, but did not manage to complete it in time. 
 
---- question 28 fill here ---
 
 ### Question 29
 
