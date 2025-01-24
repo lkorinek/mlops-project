@@ -210,10 +210,16 @@ While the project structure included notebooks and models (stored our trained mo
 > *concepts are important in larger projects because ... . For example, typing ...*
 >
 > Answer:
->
-> We ensured our code meets PEP8 standards by using the Ruff linter for code quality and formatting. Additionally, import statements were managed effectively to maintain clarity. In addition depending on the student, various docstrings were established to ensure clarity of the code and to help state the purpose of the script with its individual inputs. Establishing rules for code quality and format is essential, especially in larger projects, as it promotes consistency, improves readability, and makes the codebase more maintainable. These practices enhance collaboration among team members, minimize errors, and save time and resources in the long run.
 
---- question 6 fill here ---
+We ensured our code meets PEP8 standards by using the Ruff linter for code quality and
+formatting. Additionally, import statements were linted by setting select = ["I"]
+in the configuration file to maintain clarity.
+In addition depending on the student, various docstrings were established to ensure
+clarity of the code and to help state the purpose of the script with its individual inputs.
+Establishing rules for code quality and format is essential, especially in larger projects,
+as it promotes consistency, improves readability, and makes the codebase more maintainable.
+These practices enhance collaboration among team members, minimize errors, and save time
+and resources in the long run.
 
 ## Version control
 
@@ -232,18 +238,15 @@ While the project structure included notebooks and models (stored our trained mo
 > Answer:
 
 In total we implemented tests via 2 individual scripts. In test_data.py,
-one test function (test_data) is implemented. This function performs several
+one test function is implemented. This function performs several
 checks to validate the correctness of the data loading process, including verifying
 the image shapes, label ranges, and the uniqueness of target labels.
 Regarding the test_model.py, 8 distinct test functions are implemented.
-More specifically, it tests model
-initialization (test_model_initialization), forward passes through both the
-Simple_Network model (test_simple_network_forward) and PyTorch Lightning models
-(test_model_forward), as well as the training and validation steps using a
-PyTorch Lightning Trainer (test_training_step_with_trainer and
-test_validation_step_with_trainer), which are skipped in GitHub Actions.
-Additionally, it verifies optimizer setup (test_optimizer) and includes fixtures
-(mock_input and mock_labels) to provide mock data and labels for testing.
+It tests model initialization, forward passes through both the
+Simple_Network model and PyTorch Lightning models, as well as the training and validation steps using a
+PyTorch Lightning Trainer, which are skipped in GitHub Actions.
+Additionally, it verifies optimizer setup and includes fixtures
+to provide mock data and labels for testing.
 
 ### Question 8
 
@@ -339,11 +342,11 @@ style and maintain code standards.
 
 After successful testing, the build job is run. It authenticates with Google Cloud using
 a secure key stored in GitHub Secrets. The workflow submits the build using a
-Cloud Build configuration file - configs/cloudbuild.yaml.
+Cloud Build configuration file - configs/cloudbuild_train/deploy.yaml.
 
 We make use of pip caching for dependencies reducing the pipeline running time.
 
-An example of a triggered workflow can be seen [here](https://github.com/lkorinek/mlops-project/actions/runs/12929411230).
+An example of a triggered workflow can be seen [here](https://github.com/lkorinek/mlops-project/actions/runs/12955588650).
 
 ## Running code and tracking experiments
 
@@ -603,11 +606,13 @@ In addition, we attempted to incorporate an endpoint that would allow users to s
 > *worked. Afterwards we deployed it in the cloud, using ... . To invoke the service an user would call*
 > *`curl -X POST -F "file=@file.json"<weburl>`*
 >
-> Answer: We implemented our API using FastAPI and deployed it using Google Cloud Run. Initially, we experimented locally by running the API in a terminal window, serving it on localhost, and testing its functionality. Once verified, we pushed the API to Google Cloud Artifact Registry and deployed it to Cloud Run. For continuous deployment, we configured Cloud Build to automatically build and deploy the service whenever changes are pushed to GitHub.
+> Answer:
 
-The API dynamically loads models stored in a Google Cloud Storage bucket, with a default model loaded at startup. It also monitors data drift by updating the distribution as new predictions are added. 
+We implemented our API using FastAPI and deployed it using Google Cloud Run. Initially, we experimented locally by running the API in a terminal window, serving it on localhost, and testing its functionality. Once verified, we pushed the API to Google Cloud Artifact Registry and deployed it to Cloud Run. For continuous deployment, we configured Cloud Build to automatically build and deploy the service whenever changes are pushed to GitHub.
 
-The API can be accessed at https://gcp-app-241144182561.europe-west1.run.app/. 
+The API dynamically loads models stored in a Google Cloud Storage bucket, with a default model loaded at startup. It also monitors data drift by updating the distribution as new predictions are added.
+
+The API can be accessed at https://gcp-app-241144182561.europe-west1.run.app/.
 Commands include:
 
 Get the current model:
@@ -636,7 +641,7 @@ https://gcp-app-241144182561.europe-west1.run.app/monitoring
 >
 > Answer:
 
-We did not perform unit testing for this part of the project. However we included  basic error handling was implemented, such as validating the uploaded file format, ensuring the model is loaded before processing requests, and providing meaningful error messages for invalid inputs. To implement unit testing for this script, we would use the pytest framework, which is well-suited for testing Python applications. Tests would include verifying individual components like image preprocessing, model loading, and the /predict_pneumonia and /monitoring endpoints. Additionally, we woulf include tests for edge cases, such as handling empty inputs or corrupted files. Automated tests could be run in a CI/CD pipeline to maintain reliability.
+We did not perform unit testing for this part of the project. However, we included basic error handling, such as validating the uploaded file format, ensuring the model is loaded before processing requests, and providing meaningful error messages for invalid inputs. To implement unit testing for this script, we would use the pytest framework, which is well-suited for testing Python applications. Tests would include verifying individual components like image preprocessing, model loading, and the /predict_pneumonia and /monitoring endpoints. Additionally, we woulf include tests for edge cases, such as handling empty inputs or corrupted files. Automated tests could be run in a CI/CD pipeline to maintain reliability.
 
 ### Question 26
 
@@ -651,8 +656,8 @@ We did not perform unit testing for this part of the project. However we include
 >
 > Answer:
 
-We did implement a form of monitoring using Evidently AI and using CLIP to compute our image data feature embeddings. These embeddings were used to get the initial reference data distribution that we would use to compare current data to. The API has an inference feature where images can be uploaded and predicted using our models. These images' feature embeddings are added to the current data distribution. With enough new images the distribution might start drifting from the reference distribution signaling a time to retrain. 
-We would have liked to implement a more feature proof API where multiple data could be uploaded at once with inference. A feature for automatic retraining at a specific datadrift threshold would also have been a nice to have with automatic updating of the dataset.  
+We did implement a form of monitoring using Evidently AI and using CLIP to compute our image data feature embeddings. These embeddings were used to get the initial reference data distribution that we would use to compare current data to. The API has an inference feature where images can be uploaded and predicted using our models. These images' feature embeddings are added to the current data distribution. With enough new images the distribution might start drifting from the reference distribution signaling a time to retrain.
+We would have liked to implement a more feature proof API where multiple data could be uploaded at once with inference. A feature for automatic retraining at a specific datadrift threshold would also have been a nice to have with automatic updating of the dataset.
 
 ## Overall discussion of project
 
@@ -671,8 +676,9 @@ We would have liked to implement a more feature proof API where multiple data co
 >
 > Answer:
 
-s204118 spent 43 dkk with most going towards VM testing. 
-
+s204118 spent 43 dkk with most going towards VM testing.
+s246710 used around 2 USD with most spend on Cloud storage, Artifact registry and Vertex AI.
+We used just CPU which did not cost much.
 
 ### Question 28
 
@@ -686,8 +692,9 @@ s204118 spent 43 dkk with most going towards VM testing.
 > *We implemented a frontend for our API. We did this because we wanted to show the user ... . The frontend was*
 > *implemented using ...*
 >
-> Answer: We did start on a frontend using streamlit, but did not manage to complete it on time. 
+> Answer:
 
+We did start on a frontend using streamlit, but did not manage to complete it on time.
 
 ### Question 29
 
