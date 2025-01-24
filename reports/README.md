@@ -210,10 +210,9 @@ While the project structure included notebooks and models (stored our trained mo
 > *concepts are important in larger projects because ... . For example, typing ...*
 >
 > Answer:
->
-> We ensured our code meets PEP8 standards by using the Ruff linter for code quality and formatting. Additionally, import statements were managed effectively to maintain clarity. In addition depending on the student, various docstrings were established to ensure clarity of the code and to help state the purpose of the script with its individual inputs. Establishing rules for code quality and format is essential, especially in larger projects, as it promotes consistency, improves readability, and makes the codebase more maintainable. These practices enhance collaboration among team members, minimize errors, and save time and resources in the long run.
 
---- question 6 fill here ---
+We ensured our code meets PEP8 standards by using the Ruff linter for code quality and formatting. Additionally, import statements were managed effectively to maintain clarity. In addition depending on the student, various docstrings were established to ensure clarity of the code and to help state the purpose of the script with its individual inputs. Establishing rules for code quality and format is essential, especially in larger projects, as it promotes consistency, improves readability, and makes the codebase more maintainable. These practices enhance collaboration among team members, minimize errors, and save time and resources in the long run.
+
 
 ## Version control
 
@@ -501,7 +500,9 @@ When running into bugs during our experiments, we used a mix of debugging techni
 > Example:
 > *We used the following two services: Engine and Bucket. Engine is used for... and Bucket is used for...*
 >
-> Answer: We used the following two services: Vertex AI and Bucket.Vertex AI is a fully managed machine learning platform that simplifies the process of building, training, and deploying machine learning models at scale. We used it to train and deploy our models, leveraging its pre-built tools for experimentation and production-ready workflows.
+> Answer:
+
+We used the following two services: Vertex AI and Bucket.Vertex AI is a fully managed machine learning platform that simplifies the process of building, training, and deploying machine learning models at scale. We used it to train and deploy our models, leveraging its pre-built tools for experimentation and production-ready workflows.
 
  Google Cloud Storage provides a scalable and secure object storage solution. We used it to store and manage our datasets, including training and validation data, and to save model artifacts and other outputs during the project. Its integration with other GCP services streamlined our workflow and ensured data accessibility and security.
 
@@ -603,7 +604,9 @@ In addition, we attempted to incorporate an endpoint that would allow users to s
 > *worked. Afterwards we deployed it in the cloud, using ... . To invoke the service an user would call*
 > *`curl -X POST -F "file=@file.json"<weburl>`*
 >
-> Answer: We implemented our API using FastAPI and deployed it using Google Cloud Run. Initially, we experimented locally by running the API in a terminal window, serving it on localhost, and testing its functionality. Once verified, we pushed the API to Google Cloud Artifact Registry and deployed it to Cloud Run. For continuous deployment, we configured Cloud Build to automatically build and deploy the service whenever changes are pushed to GitHub.
+> Answer: 
+
+We implemented our API using FastAPI and deployed it using Google Cloud Run. Initially, we experimented locally by running the API in a terminal window, serving it on localhost, and testing its functionality. Once verified, we pushed the API to Google Cloud Artifact Registry and deployed it to Cloud Run. For continuous deployment, we configured Cloud Build to automatically build and deploy the service whenever changes are pushed to GitHub.
 
 The API dynamically loads models stored in a Google Cloud Storage bucket, with a default model loaded at startup. It also monitors data drift by updating the distribution as new predictions are added. 
 
@@ -686,7 +689,9 @@ s204118 spent 43 dkk with most going towards VM testing.
 > *We implemented a frontend for our API. We did this because we wanted to show the user ... . The frontend was*
 > *implemented using ...*
 >
-> Answer: We did start on a frontend using streamlit, but did not manage to complete it on time. 
+> Answer: 
+
+We did start on a frontend using streamlit, but did not manage to complete it on time. 
 
 
 ### Question 29
