@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from google.cloud import storage
 from pydantic import BaseModel
+import pickle
 
 import anyio
 import numpy as np
@@ -220,7 +221,20 @@ train_images_np = train_images.cpu().numpy()  # Convert to NumPy array if needed
 # Generate CLIP embeddings for the training dataset
 initialize_clip()  # Load CLIP model and processor
 print("Getting training embeddings for drift detection...")
-train_embeddings = get_clip_embeddings(train_images_np, clip_model, processor)
+
+# Instead of computing embedding each time
+embedding_file = "train_embeddings.pkl"
+if os.path.exists(embedding_file):
+    with open(embedding_file, "rb") as f:
+        train_embeddings = pickle.load(f)
+    print("Loaded embeddings.")
+else:
+    train_embeddings = get_clip_embeddings(train_images_np, clip_model, processor)
+    with open(embedding_file, "wb") as f:
+        pickle.dump(train_embeddings, f)
+    print("Computed and saved embeddings.")
+
+
 
 # Create reference DataFrame for drift detection
 reference_df = pd.DataFrame(train_embeddings, columns=[f"Feature_{i}" for i in range(train_embeddings.shape[1])])
