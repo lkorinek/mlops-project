@@ -484,7 +484,7 @@ Link to docker file:
 > *Debugging method was dependent on group member. Some just used ... and others used ... . We did a single profiling*
 > *run of our main code at some point that showed ...*
 >
-> Answer:
+> Answer: When running into bugs during our experiments, we used a mix of debugging techniques. Print statements were our go-to for quick insights, while exceptions and error handling helped identify edge cases. We also integrated some Pytest scripts to systematically validate our code and ensure consistent performance. Each group member brought their own effective approach—some focused on isolating specific modules, others used the VS Code console to step through and debug the code, and a few profiled performance bottlenecks to optimize execution. While we didn’t assume our code was perfect, this variety of strategies allowed us to troubleshoot efficiently and improve its robustness.
 
 --- question 16 fill here ---
 
