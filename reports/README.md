@@ -484,9 +484,9 @@ Link to docker file:
 > *Debugging method was dependent on group member. Some just used ... and others used ... . We did a single profiling*
 > *run of our main code at some point that showed ...*
 >
-> Answer: When running into bugs during our experiments, we used a mix of debugging techniques. Print statements were our go-to for quick insights, while exceptions and error handling helped identify edge cases. We also integrated some Pytest scripts to systematically validate our code and ensure consistent performance. Each group member brought their own effective approach—some focused on isolating specific modules, others used the VS Code console to step through and debug the code, and a few profiled performance bottlenecks to optimize execution. While we didn’t assume our code was perfect, this variety of strategies allowed us to troubleshoot efficiently and improve its robustness.
+> Answer:
 
---- question 16 fill here ---
+When running into bugs during our experiments, we used a mix of debugging techniques. Print statements were our go-to for quick insights, while exceptions and error handling helped identify edge cases. We also integrated some Pytest scripts to systematically validate our code and ensure consistent performance. Each group member brought their own effective approach—some focused on isolating specific modules, others used the VS Code console to step through and debug the code, and a few profiled performance bottlenecks to optimize execution. While we didn’t assume our code was perfect, this variety of strategies allowed us to troubleshoot efficiently and improve its robustness.
 
 ## Working in the cloud
 
@@ -700,10 +700,9 @@ We did not perform unit testing for this part of the project. However we include
 > Example:
 > *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
 >
-> Answer: 
-The project presented several challenges, requiring us to allocate significant time and effort to overcome them. Deploying the model into Vertex AI was particularly difficult due to limited access to trained models and artifacts from the Wb, which not all members could retrieve. To address this, we streamlined communication, shared resources among the team, and restructured workflows to improve accessibility. Another major issue was integrating the trained models with the API to allow users to select their preferred model for predictions, which demanded careful API design and testing. Additionally, managing data shifts and logging new data using Evidently proved complex, but we resolved this by experimenting with configurations, reading documentation, and dividing tasks to leverage individual strengths.
+> Answer:
 
---- question 30 fill here ---
+The project presented several challenges, requiring us to allocate significant time and effort to overcome them. Deploying the model into Vertex AI was particularly difficult due to limited access to trained models and artifacts from the Wb, which not all members could retrieve. To address this, we streamlined communication, shared resources among the team, and restructured workflows to improve accessibility. Another major issue was integrating the trained models with the API to allow users to select their preferred model for predictions, which demanded careful API design and testing. Additionally, managing data shifts and logging new data using Evidently proved complex, but we resolved this by experimenting with configurations, reading documentation, and dividing tasks to leverage individual strengths.
 
 ### Question 31
 

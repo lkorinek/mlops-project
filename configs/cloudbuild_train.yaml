@@ -1,0 +1,25 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  env:
+    - DOCKER_BUILDKIT=1
+  args: [
+    '-c',
+    "eval $(echo docker build . --build-arg 'DEFAULT_JSON=\"$$DEFAULT_JSON\"' -t europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repository/train:latest -f dockerfiles/train.dockerfile)"
+  ]
+  secretEnv: ['DEFAULT_JSON']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push container image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repository/train:latest'
+  ]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/default-json/versions/latest
+    env: 'DEFAULT_JSON'

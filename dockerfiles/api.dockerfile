@@ -3,6 +3,11 @@ EXPOSE 8080
 
 WORKDIR /
 
+ARG DEFAULT_JSON
+RUN printf "%s" "${DEFAULT_JSON}" > default.json
+
+ENV GOOGLE_APPLICATION_CREDENTIALS=default.json
+
 RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc curl wget && \
     apt clean && rm -rf /var/lib/apt/lists/* && \
