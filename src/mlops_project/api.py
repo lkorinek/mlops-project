@@ -187,12 +187,6 @@ async def get_current_model():
 
 # Data drifting stuff
 
-# Load datasets
-train_images_path = project_root / "data" / "processed" / "train_images.pt"
-if not train_images_path.exists():
-    raise FileNotFoundError(f"File {train_images_path} not found.")
-train_images = torch.load(train_images_path)
-
 # Function to preprocess images and get CLIP embeddings
 def get_clip_embeddings(images, clip_model, processor, batch_size=32):
     """Process images and extract CLIP embeddings."""
@@ -215,8 +209,6 @@ def get_clip_embeddings(images, clip_model, processor, batch_size=32):
     
     return np.vstack(embeddings)
 
-# Assuming `train_images` is a PyTorch tensor of shape (N, 3, H, W)
-train_images_np = train_images.cpu().numpy()  # Convert to NumPy array if needed
 
 # Generate CLIP embeddings for the training dataset
 initialize_clip()  # Load CLIP model and processor
@@ -229,6 +221,11 @@ if os.path.exists(embedding_file):
         train_embeddings = pickle.load(f)
     print("Loaded embeddings.")
 else:
+    train_images_path = project_root / "data" / "processed" / "train_images.pt"
+    if not train_images_path.exists():
+        raise FileNotFoundError(f"File {train_images_path} not found.")
+    train_images = torch.load(train_images_path)
+    train_images_np = train_images.cpu().numpy()  
     train_embeddings = get_clip_embeddings(train_images_np, clip_model, processor)
     with open(embedding_file, "wb") as f:
         pickle.dump(train_embeddings, f)
