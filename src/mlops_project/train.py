@@ -13,9 +13,10 @@ from model import Model
 from omegaconf import OmegaConf
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-
+from google.cloud import storage
 import wandb
 from data import load_chest_xray_data, preprocess_data
+from pathlib import Path
 
 
 def set_seed(seed: int):
@@ -108,8 +109,8 @@ def train(config) -> None:
         persistent_workers=hparams["persistent_workers"],
     )
 
-    # Saving the trained model in path models in the case of more models of the same model a suffix of "-vx" where x is version number will be added to trained model.
     model_save_path = to_absolute_path("models")
+    os.makedirs(model_save_path, exist_ok=True)
     checkpoint_callback = ModelCheckpoint(
         dirpath=model_save_path,
         filename=f"trained_{hparams['model_name']}",
@@ -132,6 +133,40 @@ def train(config) -> None:
     trainer.fit(model, train_dataloader, val_dataloader)
     trainer.test(model, test_dataloader)
     wandb.finish()
+
+    def upload_to_gcs(bucket_name, source_file_name, destination_blob_name):
+        """
+        Uploads a file to a GCS bucket.
+
+        Args:
+            bucket_name (str): Name of the GCS bucket.
+            source_file_name (str): Path to the local file.
+            destination_blob_name (str): Destination path in the GCS bucket.
+        """
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+        blob.upload_from_filename(source_file_name)
+        print(f"File {source_file_name} uploaded to {destination_blob_name} in bucket {bucket_name}.")
+
+    def push_latest_model_to_gcs():
+        # Find the most recent model checkpoint
+        bucket_name = "trained_models_mlops"
+        destination_prefix = "trained_models"
+        model_save_path = Path(to_absolute_path("models"))
+        # Find most recent file
+        saved_files = sorted(
+            Path(model_save_path).glob("trained_*.ckpt"), key=lambda f: f.stat().st_mtime, reverse=True
+        )
+
+        if saved_files:
+            latest_model = saved_files[0]
+            destination_blob_name = f"{destination_prefix}/{latest_model.name}"
+            upload_to_gcs(bucket_name, str(latest_model), destination_blob_name)
+        else:
+            print("No model checkpoints found to upload.")
+
+    push_latest_model_to_gcs()
 
 
 if __name__ == "__main__":
