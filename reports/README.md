@@ -84,8 +84,8 @@ will check the repositories and the code to verify your answers.
 * [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
 * [x] Create a trigger workflow for automatically building your docker images (M21)
 * [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
-* [ ] Create a FastAPI application that can do inference using your model (M22)
-* [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
+* [X] Create a FastAPI application that can do inference using your model (M22)
+* [X] Deploy your model in GCP using either Functions or Run as the backend (M23)
 * [ ] Write API tests for your application and setup continues integration for these (M24)
 * [ ] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
@@ -93,9 +93,9 @@ will check the repositories and the code to verify your answers.
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
-* [ ] Instrument your API with a couple of system metrics (M28)
+* [X] Check how robust your model is towards data drifting (M27)
+* [X] Deploy to the cloud a drift detection API (M27)
+* [X] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
 * [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
@@ -587,7 +587,7 @@ for hyperparameter optimization.
 
 Yes, we did manage to write an API for the model using FastAPI, which provides a user-friendly way to expose model functionality. The API accepts an input image through the /predict_pneumonia endpoint and uses a trained model to predict whether the chest X-ray indicates "Pneumonia" or "Normal." The uploaded image is preprocessed before being passed to the model for prediction.
 
-Additionally, I incorporated data drift detection using the evidently library. The /monitoring endpoint compares embeddings of new input images against a reference dataset of training embeddings to monitor data drift over time. This helps ensure that the model's predictions remain reliable as new data is processed.
+Additionally, we incorporated data drift detection using the evidently library. The /monitoring endpoint compares embeddings of new input images against a reference dataset of training embeddings to monitor data drift over time. This helps ensure that the model's predictions remain reliable as new data is processed.
 
 In addition, we attempted to incorporate an endpoint that would allow users to select from multiple pretrained and fine-tuned models stored in a Google Cloud Platform (GCP) bucket. This would give users the flexibility to switch between models dynamically. However, we faced issues with accessing and managing models in the GCP bucket, so we could not verify that this specific part of the implementation works as intended. Despite this, the API provides robust functionality for prediction and monitoring.
 
@@ -686,7 +686,7 @@ s204118 spent 43 dkk with most going towards VM testing.
 > *We implemented a frontend for our API. We did this because we wanted to show the user ... . The frontend was*
 > *implemented using ...*
 >
-> Answer: We did start on a frontend using streamlit, but did not manage to complete it in time. 
+> Answer: We did start on a frontend using streamlit, but did not manage to complete it on time. 
 
 
 ### Question 29
