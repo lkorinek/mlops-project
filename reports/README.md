@@ -700,7 +700,8 @@ We did not perform unit testing for this part of the project. However we include
 > Example:
 > *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
 >
-> Answer:
+> Answer: 
+The project presented several challenges, requiring us to allocate significant time and effort to overcome them. Deploying the model into Vertex AI was particularly difficult due to limited access to trained models and artifacts from the Wb, which not all members could retrieve. To address this, we streamlined communication, shared resources among the team, and restructured workflows to improve accessibility. Another major issue was integrating the trained models with the API to allow users to select their preferred model for predictions, which demanded careful API design and testing. Additionally, managing data shifts and logging new data using Evidently proved complex, but we resolved this by experimenting with configurations, reading documentation, and dividing tasks to leverage individual strengths.
 
 --- question 30 fill here ---
 
