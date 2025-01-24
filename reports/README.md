@@ -144,7 +144,7 @@ s246710, s204118, s230068
 > Answer:
 
 We used torchvision framework for this project. More specifically we utilized pre-trained
-models from PyTorch’s image models framework, such as ResNet50, VGG16, and DenseNet, to
+models from Pytorch Image Models (timm) framework, such as ResNet50, VGG16, and DenseNet, to
 improve classification accuracy. We used the encoder part of those models and performed
 fine-tuning in the classification for our specific task by adapting the final layers to
 classify X-ray images into two categories: Pneumonia and Normal. Torchvision is a useful
@@ -169,7 +169,16 @@ for optimization, evaluating the models based on accuracy, precision, recall, an
 >
 > Answer:
 
-We used Conda, Docker, DVC, and Git to manage our project dependencies effectively. A Conda environment was created to ensure project dependencies remained isolated and did not interfere with other projects. Dependencies are explicitly listed in requirements.txt and pyproject.toml. Finally, version control was managed with Git. A new team member would be invited to join the github repository, clone it, and run the docker file via CLI docker “build -f Docker.dockerfile . -t trainer:latest”
+We used Conda, Docker, DVC, and Git to manage our project dependencies effectively.
+A Conda environment was created to ensure project dependencies remained isolated and
+did not interfere with other projects. Dependencies are explicitly listed in requirements.txt
+and pyproject.toml. Finally, version control was managed with Git.
+
+A new team member would be invited to join the github repository, clone it. Then the memeber
+would wither install invoke and use the pre-defined commands for making new environment
+and installing the requirements. Or they could look at the commands in tasks.py and run
+them on their own. If the code does not run on their machine they can at least run the docker
+files made for such a situation.
 
 ### Question 5
 
@@ -202,7 +211,7 @@ While the project structure included notebooks and models (stored our trained mo
 >
 > Answer:
 >
-> We ensured our code meets PEP8 standards by using the Ruff linter for code quality and formatting. Additionally, import statements were managed effectively to maintain clarity. In addition depending on the student, various docstrings were established to ensure clarity of the code and to help state the purpose of the script with its individual inputs. Establishing rules for code quality and format is essential, especially in larger projects, as it promotes consistency, improves readability, and makes the codebase more maintainable. These practices enhance collaboration among team members, minimize errors, and save time and resources in the long run. 
+> We ensured our code meets PEP8 standards by using the Ruff linter for code quality and formatting. Additionally, import statements were managed effectively to maintain clarity. In addition depending on the student, various docstrings were established to ensure clarity of the code and to help state the purpose of the script with its individual inputs. Establishing rules for code quality and format is essential, especially in larger projects, as it promotes consistency, improves readability, and makes the codebase more maintainable. These practices enhance collaboration among team members, minimize errors, and save time and resources in the long run.
 
 --- question 6 fill here ---
 
@@ -218,11 +227,23 @@ While the project structure included notebooks and models (stored our trained mo
 > Recommended answer length: 50-100 words.
 >
 > Example:
-> 
 >
-> Answer: In total we implemented tests via 2 individual scripts. In test_data.py, one test function (test_data) is implemented. This function performs several checks to validate the correctness of the data loading process, including verifying the image shapes, label ranges, and the uniqueness of target labels. While it includes multiple assertions to test various aspects of the data, it is still a single test function. Regarding the test_model.py, 8 distinct test functions are implemented. More specifically, it tests model initialization (test_model_initialization), forward passes through both the Simple_Network model (test_simple_network_forward) and PyTorch Lightning models (test_model_forward), as well as the training and validation steps using a PyTorch Lightning Trainer (test_training_step_with_trainer and test_validation_step_with_trainer), which are skipped in GitHub Actions. Additionally, it verifies optimizer setup (test_optimizer) and includes fixtures (mock_input and mock_labels) to provide mock data and labels for testing. These tests ensure the models are correctly structured, function as expected, and are integrated with the training framework effectively.
+>
+> Answer:
 
---- question 7 fill here ---
+In total we implemented tests via 2 individual scripts. In test_data.py,
+one test function (test_data) is implemented. This function performs several
+checks to validate the correctness of the data loading process, including verifying
+the image shapes, label ranges, and the uniqueness of target labels.
+Regarding the test_model.py, 8 distinct test functions are implemented.
+More specifically, it tests model
+initialization (test_model_initialization), forward passes through both the
+Simple_Network model (test_simple_network_forward) and PyTorch Lightning models
+(test_model_forward), as well as the training and validation steps using a
+PyTorch Lightning Trainer (test_training_step_with_trainer and
+test_validation_step_with_trainer), which are skipped in GitHub Actions.
+Additionally, it verifies optimizer setup (test_optimizer) and includes fixtures
+(mock_input and mock_labels) to provide mock data and labels for testing.
 
 ### Question 8
 
@@ -237,7 +258,10 @@ While the project structure included notebooks and models (stored our trained mo
 >
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of code is 73 % (47 % data.py, 84 % model.py), which includes all our source code. We are not that far
+from 100 % coverage of our code but even if we hit the 100 % it does not guarantee the correctness
+of the code. We could have implemented more tests but had to work on other parts to finish the
+project.
 
 ### Question 9
 
@@ -338,8 +362,15 @@ An example of a triggered workflow can be seen [here](https://github.com/lkorine
 >
 > Answer:
 
-We used Typer, a Python library for building command-line interfaces, to manage and configure the data processing part of the project. Typer made it easy to set up and run experiments by allowing us to specify parameters directly from the command line. For example, the script src/mlops_project/data.py can be run in the terminal by specifying the input data directory and the output directory for the processed data. python data.py raw_dir processed_dir --percentage 0.8
-For the training part of the project, we used Hydra along with a configuration file to manage parameters like learning rate, weight decay, batch size, and the number of epochs. This setup helped streamline the process, ensuring the project was well-organized, reproducible, and easy to work with.
+We used Typer, a Python library for building command-line interfaces,
+to manage and configure the data processing part of the project.
+For example, the script src/mlops_project/data.py can be run
+in the terminal by specifying the input data directory and the output directory for
+the processed data. python data.py raw_dir processed_dir --percentage 0.8
+For the training part of the project, we used Hydra along with a configuration file
+to manage parameters like learning rate, weight decay, batch size, and the number
+of epochs. To run a new experiment a new config can be made in
+configs/train_config/experiment/.
 
 ### Question 13
 
@@ -354,10 +385,10 @@ For the training part of the project, we used Hydra along with a configuration f
 >
 > Answer:
 
-To ensure reproducibility of our experiments we made use of hydra config files that outputs a report of the hyperparameters each time a model is trained along with a function named set_seed. 
-This function ensures the model configuration using the torch library for all devices cpu, gpu and even multi-gpu are initialized the same way each time and are deterministic. 
-To reproduce an experiment we would simply go to the output folder with our experiment and copy paste these configs and input them into our training configuration and run the train.py file. 
-This ensures the model's reproducibility, provided it is run either within a docker container or on the same operating system as the model you're trying to reproduce was trained on. 
+To ensure reproducibility of our experiments we made use of hydra config files that outputs a report of the hyperparameters each time a model is trained along with a function named set_seed.
+This function ensures the model configuration using the torch library for all devices cpu, gpu and even multi-gpu are initialized the same way each time and are deterministic.
+To reproduce an experiment we would simply go to the output folder with our experiment and copy paste these configs and input them into our training configuration and run the train.py file.
+This ensures the model's reproducibility, provided it is run either within a docker container or on the same operating system as the model you're trying to reproduce was trained on.
 Running the model on different operating systems with the same config will likely give different results.
 
 ### Question 14
@@ -472,9 +503,7 @@ Link to docker file:
 >
 > Answer: We used the following two services: Vertex AI and Bucket.Vertex AI is a fully managed machine learning platform that simplifies the process of building, training, and deploying machine learning models at scale. We used it to train and deploy our models, leveraging its pre-built tools for experimentation and production-ready workflows.
 
- Google Cloud Storage provides a scalable and secure object storage solution. We used it to store and manage our datasets, including training and validation data, and to save model artifacts and other outputs during the project. Its integration with other GCP services streamlined our workflow and ensured data accessibility and security. 
-
---- question 17 fill here ---
+ Google Cloud Storage provides a scalable and secure object storage solution. We used it to store and manage our datasets, including training and validation data, and to save model artifacts and other outputs during the project. Its integration with other GCP services streamlined our workflow and ensured data accessibility and security.
 
 ### Question 18
 
