@@ -129,7 +129,7 @@ will check the repositories and the code to verify your answers.
 >
 > Answer:
 
-s246710, s204118
+s246710, s204118, s230068
 
 ### Question 3
 > **A requirement to the project is that you include a third-party package not covered in the course. What framework**
@@ -218,10 +218,9 @@ While the project structure included notebooks and models (stored our trained mo
 > Recommended answer length: 50-100 words.
 >
 > Example:
-> *In total we have implemented X tests. Primarily we are testing ... and ... as these the most critical parts of our*
-> *application but also ... .*
+> 
 >
-> Answer:
+> Answer: In total we implemented tests via 2 individual scripts. In test_data.py, one test function (test_data) is implemented. This function performs several checks to validate the correctness of the data loading process, including verifying the image shapes, label ranges, and the uniqueness of target labels. While it includes multiple assertions to test various aspects of the data, it is still a single test function. Regarding the test_model.py, 8 distinct test functions are implemented. More specifically, it tests model initialization (test_model_initialization), forward passes through both the Simple_Network model (test_simple_network_forward) and PyTorch Lightning models (test_model_forward), as well as the training and validation steps using a PyTorch Lightning Trainer (test_training_step_with_trainer and test_validation_step_with_trainer), which are skipped in GitHub Actions. Additionally, it verifies optimizer setup (test_optimizer) and includes fixtures (mock_input and mock_labels) to provide mock data and labels for testing. These tests ensure the models are correctly structured, function as expected, and are integrated with the training framework effectively.
 
 --- question 7 fill here ---
 
