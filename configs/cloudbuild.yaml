@@ -20,12 +20,12 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Build container image'
   args: [
-    'build',
+    'docker build',
+    '-f',
+    'dockerfiles/api.dockerfile',
     '.',
     '-t',
     'europe-west1-docker.pkg.dev/deft-gearbox-447811-p4/dtu-mlops-project/gcp_app:latest',
-    '-f',
-    'dockerfiles/api.dockerfile'
   ]
   secretEnv: ['secrets']
 
