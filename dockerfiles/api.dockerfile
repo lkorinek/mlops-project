@@ -1,5 +1,5 @@
 FROM python:3.11-slim AS base
-EXPOSE $PORT
+EXPOSE 8080
 
 WORKDIR /
 
@@ -22,4 +22,4 @@ COPY pyproject.toml pyproject.toml
 RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 RUN pip install . --no-deps --no-cache-dir --verbose
 
-CMD ["uvicorn", "src.mlops_project.api:app", "--port", "$PORT", "--host", "0.0.0.0", "--workers", "1"]
+CMD ["uvicorn", "src.mlops_project.api:app", "--port", "8080", "--host", "0.0.0.0", "--workers", "1"]
