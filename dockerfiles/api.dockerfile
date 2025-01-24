@@ -4,15 +4,13 @@ EXPOSE 8080
 WORKDIR /
 
 RUN apt update && \
-    apt install --no-install-recommends -y build-essential gcc && \
-    apt clean && rm -rf /var/lib/apt/lists/*
+    apt install --no-install-recommends -y build-essential gcc curl wget && \
+    apt clean && rm -rf /var/lib/apt/lists/* && \
+    curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts && \
+    ln -s /google-cloud-sdk/bin/gsutil /usr/bin/gsutil
 
-# Not at all best practice, but due to deadline, use a service account key
-COPY service_account.json service_account.json
-# Need this to access google cloud storage on docker
-ENV GOOGLE_APPLICATION_CREDENTIALS="service_account.json"
-# Files we need
-COPY train_embeddings.pkl train_embeddings.pkl
+RUN /root/google-cloud-sdk/bin/gsutil cp gs://embedding_data_mlops/train_embeddings.pkl train_embeddings.pkl
+
 COPY src/mlops_project/api.py src/mlops_project/api.py
 COPY src/mlops_project/model.py src/mlops_project/model.py
 
