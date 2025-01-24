@@ -174,8 +174,8 @@ A Conda environment was created to ensure project dependencies remained isolated
 did not interfere with other projects. Dependencies are explicitly listed in requirements.txt
 and pyproject.toml. Finally, version control was managed with Git.
 
-A new team member would be invited to join the github repository, clone it. Then the memeber
-would wither install invoke and use the pre-defined commands for making new environment
+A new team member would be invited to join the github repository, clone it. Then the member
+would either install invoke and use the pre-defined commands for making new environment
 and installing the requirements. Or they could look at the commands in tasks.py and run
 them on their own. If the code does not run on their machine they can at least run the docker
 files made for such a situation.
@@ -275,7 +275,7 @@ project.
 >
 > Answer:
 
-We used branches couple times during the project, but since team members worked
+We used branches a couple times during the project, but since team members worked
 on separate parts that didn’t impact each other, it was simpler to just work on the main
 branch. However, there were pull requests created by Dependabot for dependency updates.
 
@@ -446,7 +446,7 @@ During the training phase, Docker is used to create a containerized environment 
 encapsulates both the training dataset and the training script. This approach guarantees
 consistency and reproducibility of the training process across various environments.
 
-For our project, we developed two Docker images: one for training and another for running hyperparameter sweeps.
+For our project, we developed thre Docker images: one for training and another for running hyperparameter sweeps and lastly one for the API.
 There are two ways to build the training Docker image:
 
 1. Using docker build:
@@ -502,7 +502,7 @@ When running into bugs during our experiments, we used a mix of debugging techni
 >
 > Answer:
 
-We used the following two services: Vertex AI and Bucket.Vertex AI is a fully managed machine learning platform that simplifies the process of building, training, and deploying machine learning models at scale. We used it to train and deploy our models, leveraging its pre-built tools for experimentation and production-ready workflows.
+We used the following two services: Vertex AI and Bucket. Vertex AI is a fully managed machine learning platform that simplifies the process of building, training, and deploying machine learning models at scale. We used it to train and deploy our models, leveraging its pre-built tools for experimentation and production-ready workflows.
 
  Google Cloud Storage provides a scalable and secure object storage solution. We used it to store and manage our datasets, including training and validation data, and to save model artifacts and other outputs during the project. Its integration with other GCP services streamlined our workflow and ensured data accessibility and security.
 
@@ -655,7 +655,7 @@ We did not perform unit testing for this part of the project. However we include
 > Answer:
 
 We did implement a form of monitoring using Evidently AI and using CLIP to compute our image data feature embeddings. These embeddings were used to get the initial reference data distribution that we would use to compare current data to. The API has an inference feature where images can be uploaded and predicted using our models. These images' feature embeddings are added to the current data distribution. With enough new images the distribution might start drifting from the reference distribution signaling a time to retrain. 
-We would have liked to implement a more feature proof API where multiple data could be uploaded at once with inference. A feature for automatic retraining at a specific datadrift threshold would also have been a nice to have with automatic updating of the dataset.  
+We would have liked to implement a more feature rich API where multiple data could be uploaded at once with inference. A feature for automatic retraining at a specific datadrift threshold would also have been a nice to have with automatic updating of the dataset.  
 
 ## Overall discussion of project
 
