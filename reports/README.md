@@ -470,7 +470,9 @@ Link to docker file:
 > Example:
 > *We used the following two services: Engine and Bucket. Engine is used for... and Bucket is used for...*
 >
-> Answer:
+> Answer: We used the following two services: Vertex AI and Bucket.Vertex AI is a fully managed machine learning platform that simplifies the process of building, training, and deploying machine learning models at scale. We used it to train and deploy our models, leveraging its pre-built tools for experimentation and production-ready workflows.
+
+ Google Cloud Storage provides a scalable and secure object storage solution. We used it to store and manage our datasets, including training and validation data, and to save model artifacts and other outputs during the project. Its integration with other GCP services streamlined our workflow and ensured data accessibility and security. 
 
 --- question 17 fill here ---
 
