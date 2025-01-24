@@ -1,4 +1,5 @@
 steps:
+# TRAIN
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   env:
@@ -14,6 +15,38 @@ steps:
   args: [
     'push',
     'europe-west1-docker.pkg.dev/$PROJECT_ID/docker-repository/train:latest'
+  ]
+# API
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build container image'
+  args: [
+    'build',
+    '.',
+    '--build-arg', 'DEFAULT_JSON=$$DEFAULT_JSON',
+    '-t',
+    'europe-west1-docker.pkg.dev/deft-gearbox-447811-p4/dtu-mlops-project/gcp_app:latest',
+    '-f',
+    'dockerfiles/api.dockerfile'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push container image'
+  args: [
+    'push',
+    'europe-west1-docker.pkg.dev/deft-gearbox-447811-p4/dtu-mlops-project/gcp_app:latest'
+  ]
+  secretEnv: ['DEFAULT_JSON']
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'Deploy to Cloud Run'
+  args: [
+    'run',
+    'deploy',
+    'gcp-app',
+    '--image',
+    'europe-west1-docker.pkg.dev/deft-gearbox-447811-p4/dtu-mlops-project/gcp_app:latest',
+    '--region',
+    'europe-west1',
+    '--platform',
+    'managed',
   ]
 availableSecrets:
   secretManager:
