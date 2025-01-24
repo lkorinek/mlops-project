@@ -201,6 +201,8 @@ While the project structure included notebooks and models (stored our trained mo
 > *concepts are important in larger projects because ... . For example, typing ...*
 >
 > Answer:
+>
+> We ensured our code meets PEP8 standards by using the Ruff linter for code quality and formatting. Additionally, import statements were managed effectively to maintain clarity. In addition depending on the student, various docstrings were established to ensure clarity of the code and to help state the purpose of the script with its individual inputs. Establishing rules for code quality and format is essential, especially in larger projects, as it promotes consistency, improves readability, and makes the codebase more maintainable. These practices enhance collaboration among team members, minimize errors, and save time and resources in the long run. 
 
 --- question 6 fill here ---
 
