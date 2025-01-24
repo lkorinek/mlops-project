@@ -30,10 +30,13 @@ processor = None
 current_model_name = None
 
 # Image transformation pipeline
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-])
+transform = transforms.Compose(
+    [
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+    ]
+)
+
 
 # Initialize CLIP model and processor
 def initialize_clip():
@@ -44,24 +47,26 @@ def initialize_clip():
         processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
         print("CLIP model and processor loaded.")
 
+
 # List available models in the GCP bucket
 def list_models_in_gcp():
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
     return [blob.name for blob in bucket.list_blobs() if blob.name.endswith(".ckpt")]
 
+
 # Download a model from GCP
 def download_model_from_gcp(model_name):
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
-    
+
     # Remove 'trained_models/' prefix if it's included in the model name
     if model_name.startswith("trained_models/"):
-        model_name = model_name[len("trained_models/"):]
+        model_name = model_name[len("trained_models/") :]
 
     # Construct the blob path and download the model
     blob = bucket.blob(f"trained_models/{model_name}")  # Ensure correct path in GCP bucket
-    
+
     # Extract the model filename
     model_filename = model_name.split("/")[-1]
     local_path = LOCAL_MODEL_DIR / model_filename
@@ -75,23 +80,26 @@ def download_model_from_gcp(model_name):
             raise RuntimeError(f"Failed to download model {model_name}: {str(e)}")
     else:
         print(f"Model {local_path} already exists locally. Skipping download.")
-    
+
     return local_path
 
 
 def load_model(model_path):
     """
-    Load the model and assign as current model 
+    Load the model and assign as current model
     """
-    global model, current_model_name  
+    global model, current_model_name
     if not model_path.exists():
         raise FileNotFoundError(f"Model file {model_path} not found.")
-    
-    model_name = model_path.stem.replace("trained_", "").split('-')[0]
-    model = Model.load_from_checkpoint(model_path, model_name=model_name, num_classes=1, map_location=torch.device("cpu"))
+
+    model_name = model_path.stem.replace("trained_", "").split("-")[0]
+    model = Model.load_from_checkpoint(
+        model_path, model_name=model_name, num_classes=1, map_location=torch.device("cpu")
+    )
     model.eval()
     current_model_name = model_name  # Update the global variable
     print(f"Loaded model: {current_model_name}")
+
 
 async def lifespan(app: FastAPI):
     """
@@ -102,13 +110,13 @@ async def lifespan(app: FastAPI):
     LOCAL_MODEL_DIR.mkdir(exist_ok=True)
 
     # Default model that gets loaded (from cloud)
-    default_model_name = "trained_densenet121-v1.ckpt" 
+    default_model_name = "trained_densenet121-v1.ckpt"
     try:
         # Check if the model exists in GCP before attempting to download
         available_models = list_models_in_gcp()
-        if f"trained_models/{default_model_name}" not in available_models: 
+        if f"trained_models/{default_model_name}" not in available_models:
             raise RuntimeError(f"Model: {default_model_name} not found in the GCP bucket.")
-        
+
         model_path = download_model_from_gcp(default_model_name)
         print(model_path)
         load_model(model_path)
@@ -122,7 +130,9 @@ async def lifespan(app: FastAPI):
     print("Cleaning up...")
     del model
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/models")
 async def list_models():
@@ -132,20 +142,22 @@ async def list_models():
     available_models = list_models_in_gcp()
     return {"available_models": available_models}
 
+
 # Helper for requesting the model
 class ModelSelectRequest(BaseModel):
     model_name: str
+
 
 @app.post("/models/select", response_model=dict)
 async def select_model(request: ModelSelectRequest):
     """
     Select a specific model for inference from the GCP bucket.
     """
-    global model, current_model_name # updating
+    global model, current_model_name  # updating
 
     # Print the request data for debugging
     print(f"Received request: {request.dict()}")
-    model_name = request.model_name  
+    model_name = request.model_name
     available_models = list_models_in_gcp()
     print(f"Available models: {available_models}")
 
@@ -158,7 +170,7 @@ async def select_model(request: ModelSelectRequest):
                 "available_models": available_models,
             },
         )
-    
+
     try:
         # Download and load the model
         model_path = download_model_from_gcp(model_name)
@@ -173,19 +185,19 @@ async def select_model(request: ModelSelectRequest):
             content={"detail": f"Failed to load model '{model_name}': {str(e)}"},
         )
 
+
 @app.get("/models/current")
 async def get_current_model():
     """
     Get the name of the currently loaded model.
     """
     if current_model_name is None:
-        raise HTTPException(
-            status_code=404,
-            detail="No model is currently loaded."
-        )
+        raise HTTPException(status_code=404, detail="No model is currently loaded.")
     return {"current_model": current_model_name}
 
+
 # Data drifting stuff
+
 
 # Function to preprocess images and get CLIP embeddings
 def get_clip_embeddings(images, clip_model, processor, batch_size=32):
@@ -196,7 +208,7 @@ def get_clip_embeddings(images, clip_model, processor, batch_size=32):
         batch_tensor = torch.tensor(batch, dtype=torch.float32) / 255.0
         if batch_tensor.ndim == 4 and batch_tensor.shape[1] == 3:
             batch_tensor = batch_tensor.permute(0, 2, 3, 1)
-        
+
         # Convert to PIL (Processor expects PIL images)
         pil_images = [Image.fromarray((img.numpy() * 255).astype("uint8")) for img in batch_tensor]
 
@@ -206,7 +218,7 @@ def get_clip_embeddings(images, clip_model, processor, batch_size=32):
         with torch.no_grad():
             batch_embeddings = clip_model.get_image_features(inputs["pixel_values"])
         embeddings.append(batch_embeddings.cpu().numpy())
-    
+
     return np.vstack(embeddings)
 
 
@@ -225,12 +237,11 @@ else:
     if not train_images_path.exists():
         raise FileNotFoundError(f"File {train_images_path} not found.")
     train_images = torch.load(train_images_path)
-    train_images_np = train_images.cpu().numpy()  
+    train_images_np = train_images.cpu().numpy()
     train_embeddings = get_clip_embeddings(train_images_np, clip_model, processor)
     with open(embedding_file, "wb") as f:
         pickle.dump(train_embeddings, f)
     print("Computed and saved embeddings.")
-
 
 
 # Create reference DataFrame for drift detection
@@ -242,6 +253,7 @@ print("Reference dataset created.")
 current_df = reference_df.copy()
 current_df["Dataset"] = "Current"
 
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
@@ -252,6 +264,7 @@ async def root():
         <li><a href="/monitoring">Monitoring Dashboard</a></li>
     </ul>
     """
+
 
 @app.get("/monitoring", response_class=HTMLResponse)
 async def xray_monitoring():
@@ -275,8 +288,10 @@ async def xray_monitoring():
 
     return HTMLResponse(content=html_content, status_code=200)
 
+
 # Define class labels
 true_labels = ["Normal", "Pneumonia"]
+
 
 @app.post("/predict_pneumonia")
 async def predict_pneumonia(file: UploadFile = File(...)):
@@ -312,7 +327,9 @@ async def predict_pneumonia(file: UploadFile = File(...)):
     predicted_embedding = predicted_embedding.squeeze(0).numpy()  # (512,) embeddings
 
     # Convert the embeddings into a DataFrame
-    new_embedding = pd.DataFrame([predicted_embedding], columns=[f"Feature_{i}" for i in range(predicted_embedding.shape[0])])  # predicted_embedding.shape[0] will give 512
+    new_embedding = pd.DataFrame(
+        [predicted_embedding], columns=[f"Feature_{i}" for i in range(predicted_embedding.shape[0])]
+    )  # predicted_embedding.shape[0] will give 512
     new_embedding["Dataset"] = "Current"
 
     # Add the new embedding to the current DataFrame
@@ -321,8 +338,10 @@ async def predict_pneumonia(file: UploadFile = File(...)):
 
     return JSONResponse(content={"label": label})
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("src.mlops_project.api:app", host="0.0.0.0", port=8000, reload=True)
 
     """
